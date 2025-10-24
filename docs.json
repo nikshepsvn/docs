@@ -15,11 +15,6 @@
     }
   },
   "favicon": "/favicon.svg",
-  "logo": {
-    "light": "/logo/light.png",
-    "dark": "/logo/dark.png",
-    "href": "https://tremor.sh"
-  },
   "navigation": {
     "tabs": [
       {
