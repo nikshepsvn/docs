@@ -222,10 +222,55 @@ curl -X POST https://api.tremor.sh/query \
   </Card>
 </Columns>
 
+## Built-in Dashboards
+
+<Columns cols={2}>
+  <Card title="EventsPulse" icon="chart-line">
+    **Polymarket Intelligence Dashboard**
+    - Market intelligence overview
+    - TossUps (45-55% competitive markets)
+    - Shock Moves (>10% daily changes)
+    - Volume spikes and trends
+  </Card>
+  <Card title="KalshiPulse" icon="landmark">
+    **Kalshi Market Dashboard**
+    - CFTC-regulated market tracking
+    - Real-time price movements
+    - Volume and liquidity analysis
+    - Settlement monitoring
+  </Card>
+</Columns>
+
+### Query Tools
+
+<Steps>
+  <Step title="SQL Editor">
+    Advanced query editor with syntax highlighting, line numbers, and auto-completion
+  </Step>
+  <Step title="Schema Browser">
+    Interactive table explorer with column types, sample data, and statistics
+  </Step>
+  <Step title="AI Assistant">
+    Claude-powered natural language to SQL conversion with streaming responses
+  </Step>
+  <Step title="Query History">
+    Automatic tracking of all queries with execution time and result metadata
+  </Step>
+</Steps>
+
+## Data Catalog
+
+Explore your data with comprehensive metadata:
+
+- **Table Discovery** - Browse all available tables and schemas
+- **Column Statistics** - Min/max values, distinct counts, data types
+- **Sample Data** - Preview rows before writing queries
+- **Relationship Mapping** - Understand connections between tables
+
 ## Coming Soon
 
 <Note>
-Check out our [roadmap](/roadmap) for upcoming features and improvements.
+Check out our roadmap for upcoming features and improvements.
 </Note>
 
 - **WebSocket streaming** - Real-time market updates
