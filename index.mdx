@@ -1,97 +1,148 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Tremor Documentation"
+description: "The Data Terminal for Prediction Markets"
 ---
 
-## Setting up
+# Welcome to Tremor
 
-Get your documentation site up and running in minutes.
+Query millions of markets. Historical snapshots every 5 minutes. SQL access to the richest source of human forecasts.
 
 <Card
-  title="Start here"
+  title="Get Started"
   icon="rocket"
   href="/quickstart"
   horizontal
 >
-  Follow our three step quickstart guide.
+  Start querying prediction market data in minutes
 </Card>
 
-## Make it yours
+## What is Tremor?
 
-Design a docs site that looks great and empowers your users.
+Tremor provides fast, reliable access to prediction market data from Polymarket and Kalshi. Built for traders, researchers, and enterprises who need historical market data and real-time analytics.
+
+### Key Features
 
 <Columns cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+    title="166K+ Markets"
+    icon="chart-line"
   >
-    Edit your docs locally and preview them in real time.
+    Complete coverage of Polymarket and Kalshi markets with comprehensive historical data
   </Card>
   <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
+    title="5-Minute Snapshots"
+    icon="clock"
   >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+    Historical data snapshots every 5 minutes with unlimited retention
   </Card>
   <Card
-    title="API documentation"
+    title="Sub-200ms Queries"
+    icon="bolt"
+  >
+    ClickHouse-powered SQL engine for lightning-fast analytics
+  </Card>
+  <Card
+    title="REST API"
+    icon="code"
+  >
+    Programmatic access with API key authentication and no rate limits
+  </Card>
+</Columns>
+
+## Quick Example Queries
+
+### Find Arbitrage Opportunities
+
+```sql
+SELECT
+  p.title,
+  p.yes_probability as polymarket_yes,
+  k.yes_probability as kalshi_yes,
+  ABS(p.yes_probability - k.yes_probability) as spread
+FROM polymarket_events p
+INNER JOIN kalshi_events k ON similarity(p.title, k.title) > 0.8
+WHERE spread > 0.05
+ORDER BY spread DESC;
+```
+
+### Track Market History
+
+```sql
+SELECT
+  sync_timestamp,
+  yes_probability,
+  volume_24hr
+FROM polymarket_events
+WHERE id = 'trump-2024-election'
+ORDER BY sync_timestamp DESC
+LIMIT 1000;
+```
+
+### Volume Leaders
+
+```sql
+SELECT
+  title,
+  volume_24hr,
+  liquidity
+FROM polymarket_events
+WHERE active = true
+ORDER BY volume_24hr DESC
+LIMIT 10;
+```
+
+## Use Cases
+
+<Columns cols={3}>
+  <Card
+    title="Trading"
+    icon="chart-candlestick"
+  >
+    Identify arbitrage opportunities across prediction markets
+  </Card>
+  <Card
+    title="Research"
+    icon="flask"
+  >
+    Analyze market sentiment and forecasting accuracy
+  </Card>
+  <Card
+    title="Analytics"
+    icon="magnifying-glass-chart"
+  >
+    Build dashboards and monitor market trends
+  </Card>
+</Columns>
+
+## Next Steps
+
+<Columns cols={2}>
+  <Card
+    title="Quickstart"
+    icon="play"
+    href="/quickstart"
+  >
+    Get up and running with Tremor in minutes
+  </Card>
+  <Card
+    title="API Reference"
     icon="terminal"
     href="/api-reference/introduction"
   >
-    Auto-generate API documentation from OpenAPI specifications.
+    Explore the complete API documentation
+  </Card>
+  <Card
+    title="Architecture"
+    icon="sitemap"
+    href="/essentials/architecture"
+  >
+    Learn how Tremor works under the hood
+  </Card>
+  <Card
+    title="Query Examples"
+    icon="database"
+    href="/essentials/arbitrage-queries"
+  >
+    Discover powerful query patterns
   </Card>
 </Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>

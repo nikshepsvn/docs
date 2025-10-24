@@ -1,80 +1,201 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get started with Tremor in minutes"
 ---
 
-## Get started in three steps
+# Quickstart Guide
 
-Get your documentation site running locally and make your first customization.
+Get up and running with Tremor's prediction market data terminal in just a few steps.
 
-### Step 1: Set up your local environment
+## 1. Access the Dashboard
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+Visit [tremor.sh](https://tremor.sh) and sign in with your account.
 
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
+<Card
+  title="Try Tremor"
+  icon="arrow-right"
+  href="https://tremor.sh"
+  horizontal
+>
+  Launch the Tremor dashboard
 </Card>
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
+## 2. Get Your API Key
+
+Navigate to the Settings page and generate your API key for programmatic access.
+
+<Warning>
+Keep your API key secure! Never commit it to version control or share it publicly.
+</Warning>
+
+## 3. Run Your First Query
+
+### Using the Web Interface
+
+Use the SQL editor in the dashboard to run your first query:
+
+```sql
+SELECT
+  title,
+  yes_probability,
+  volume_24hr,
+  liquidity
+FROM polymarket_events
+WHERE active = true
+ORDER BY volume_24hr DESC
+LIMIT 10;
+```
+
+<Info>
+This query returns the top 10 most traded markets on Polymarket.
+</Info>
+
+### Using the API
+
+Make your first API request using curl:
+
+```bash
+curl -X POST https://api.tremor.sh/query \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "SELECT title, yes_probability FROM polymarket_events LIMIT 5"
+  }'
+```
+
+## 4. Explore the Data
+
+### Available Tables
+
+<Columns cols={2}>
+  <Card title="polymarket_events" icon="chart-pie">
+    Polymarket prediction markets with probabilities, volume, and liquidity
+  </Card>
+  <Card title="kalshi_events" icon="chart-bar">
+    Kalshi regulated prediction markets with similar metrics
+  </Card>
+</Columns>
+
+### Key Columns
+
+<CodeGroup>
+
+```sql polymarket_events
+SELECT
+  id,                    -- Unique market identifier
+  title,                 -- Market question
+  yes_probability,       -- Current yes probability (0-1)
+  no_probability,        -- Current no probability (0-1)
+  volume_24hr,          -- 24-hour trading volume
+  liquidity,            -- Available liquidity
+  active,               -- Market status
+  sync_timestamp        -- Snapshot timestamp
+FROM polymarket_events;
+```
+
+```sql kalshi_events
+SELECT
+  id,                    -- Unique market identifier
+  title,                 -- Market question
+  yes_probability,       -- Current yes probability (0-1)
+  no_probability,        -- Current no probability (0-1)
+  volume_24hr,          -- 24-hour trading volume
+  active,               -- Market status
+  sync_timestamp        -- Snapshot timestamp
+FROM kalshi_events;
+```
+
+</CodeGroup>
+
+## 5. Try Advanced Queries
+
+### Find Cross-Platform Arbitrage
+
+```sql
+SELECT
+  p.title,
+  p.yes_probability as polymarket_yes,
+  k.yes_probability as kalshi_yes,
+  ABS(p.yes_probability - k.yes_probability) as spread,
+  p.volume_24hr as poly_volume,
+  k.volume_24hr as kalshi_volume
+FROM polymarket_events p
+INNER JOIN kalshi_events k ON similarity(p.title, k.title) > 0.8
+WHERE spread > 0.05
+  AND p.active = true
+  AND k.active = true
+ORDER BY spread DESC
+LIMIT 20;
+```
+
+### Track Market Movement Over Time
+
+```sql
+SELECT
+  sync_timestamp,
+  yes_probability,
+  volume_24hr,
+  liquidity
+FROM polymarket_events
+WHERE id = 'your-market-id'
+  AND sync_timestamp >= now() - INTERVAL 7 DAY
+ORDER BY sync_timestamp DESC;
+```
+
+### Analyze Market Sentiment
+
+```sql
+SELECT
+  DATE(sync_timestamp) as date,
+  AVG(yes_probability) as avg_yes_prob,
+  SUM(volume_24hr) as total_volume,
+  COUNT(*) as active_markets
+FROM polymarket_events
+WHERE active = true
+  AND sync_timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date DESC;
+```
+
+## Next Steps
+
+<Columns cols={2}>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/introduction"
+  >
+    Explore the complete API documentation
+  </Card>
+  <Card
+    title="Query Examples"
+    icon="code"
+    href="/essentials/arbitrage-queries"
+  >
+    Learn advanced query patterns
+  </Card>
+  <Card
+    title="Architecture"
+    icon="sitemap"
+    href="/essentials/architecture"
+  >
+    Understand how Tremor works
+  </Card>
+  <Card
+    title="Data Sources"
+    icon="database"
+    href="/essentials/data-sources"
+  >
+    Learn about Polymarket and Kalshi data
+  </Card>
+</Columns>
+
+## Need Help?
+
+<Card
+  title="Support"
+  icon="life-ring"
+  href="mailto:team@tremor.sh"
+>
+  Contact our team at team@tremor.sh
 </Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

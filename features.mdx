@@ -1,0 +1,245 @@
+---
+title: "Features"
+description: "Comprehensive overview of Tremor's capabilities"
+---
+
+# Tremor Features
+
+Tremor provides a complete data infrastructure for prediction market analysis, trading, and research.
+
+## Data Coverage
+
+### 166,000+ Markets Tracked
+
+<Info>
+Tremor maintains comprehensive coverage across both Polymarket and Kalshi platforms.
+</Info>
+
+<Columns cols={2}>
+  <Card title="Polymarket" icon="chart-pie">
+    - Decentralized prediction markets
+    - Complete market metadata
+    - Real-time price updates
+    - Historical snapshots
+  </Card>
+  <Card title="Kalshi" icon="landmark">
+    - CFTC-regulated markets
+    - Event contracts
+    - Settlement data
+    - Market mechanics
+  </Card>
+</Columns>
+
+## Historical Data
+
+### 5-Minute Snapshots
+
+Every market is captured every 5 minutes, providing:
+
+- **Unlimited retention** - Never lose historical data
+- **Time-travel queries** - Analyze any point in time
+- **Trend analysis** - Track market movements
+- **Backtesting** - Test trading strategies
+
+```sql
+-- Example: View market history for the past week
+SELECT
+  sync_timestamp,
+  yes_probability,
+  volume_24hr,
+  liquidity
+FROM polymarket_events
+WHERE id = 'your-market-id'
+  AND sync_timestamp >= now() - INTERVAL 7 DAY
+ORDER BY sync_timestamp;
+```
+
+## Query Performance
+
+### Sub-200ms Response Times
+
+<Tip>
+Powered by ClickHouse, a columnar database optimized for analytical queries.
+</Tip>
+
+**Performance characteristics:**
+- **Fast aggregations** - Process millions of rows in milliseconds
+- **Time-series optimized** - Efficient handling of historical data
+- **Parallel processing** - Multi-core query execution
+- **Smart caching** - Frequently accessed data stays hot
+
+### Full SQL Support
+
+Use the complete power of SQL:
+
+<Columns cols={2}>
+  <Card title="Joins" icon="link">
+    Cross-platform market comparison and arbitrage detection
+  </Card>
+  <Card title="Aggregations" icon="chart-bar">
+    Statistical analysis and trend calculations
+  </Card>
+  <Card title="Window Functions" icon="window">
+    Moving averages and time-series analysis
+  </Card>
+  <Card title="CTEs" icon="code-branch">
+    Complex multi-step queries with readability
+  </Card>
+</Columns>
+
+## API Access
+
+### REST API
+
+Programmatic access to all Tremor features:
+
+```bash
+curl -X POST https://api.tremor.sh/query \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "SELECT * FROM polymarket_events LIMIT 10"
+  }'
+```
+
+**API Features:**
+- **No rate limits** - Query as much as you need
+- **API key authentication** - Secure access control
+- **JSON responses** - Easy integration
+- **Batch queries** - Multiple queries in one request
+
+### AI Assistant
+
+Natural language to SQL conversion:
+
+<Steps>
+  <Step title="Ask a question">
+    Type your question in plain English: "Show me the top 10 markets by volume"
+  </Step>
+  <Step title="Get SQL">
+    The AI assistant generates optimized SQL
+  </Step>
+  <Step title="Execute">
+    Review and run the query with one click
+  </Step>
+</Steps>
+
+## Data Quality
+
+### Automatic Deduplication
+
+Tremor uses ClickHouse's **ReplacingMergeTree** engine to ensure:
+
+- No duplicate snapshots
+- Consistent data across queries
+- Efficient storage
+- Accurate historical records
+
+### Data Freshness
+
+- **5-minute sync interval** - Near real-time data
+- **Automatic retries** - Resilient data collection
+- **Health monitoring** - Proactive issue detection
+- **Status dashboard** - Visibility into sync status
+
+## Use Cases
+
+<Columns cols={3}>
+  <Card title="Arbitrage Trading" icon="scale-balanced">
+    Identify price discrepancies across platforms for profitable trades
+  </Card>
+  <Card title="Market Research" icon="magnifying-glass-chart">
+    Analyze forecasting accuracy and market sentiment
+  </Card>
+  <Card title="Risk Analysis" icon="shield-halved">
+    Assess market volatility and liquidity risks
+  </Card>
+  <Card title="Strategy Backtesting" icon="clock-rotate-left">
+    Test trading strategies against historical data
+  </Card>
+  <Card title="Trend Detection" icon="arrow-trend-up">
+    Identify emerging markets and topics
+  </Card>
+  <Card title="Custom Dashboards" icon="chart-line">
+    Build real-time monitoring interfaces
+  </Card>
+</Columns>
+
+## Integration
+
+### Developer-Friendly
+
+<CodeGroup>
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.tremor.sh/query",
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={"query": "SELECT * FROM polymarket_events LIMIT 10"}
+)
+data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.tremor.sh/query', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: 'SELECT * FROM polymarket_events LIMIT 10'
+  })
+});
+const data = await response.json();
+```
+
+```bash cURL
+curl -X POST https://api.tremor.sh/query \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "SELECT * FROM polymarket_events LIMIT 10"}'
+```
+
+</CodeGroup>
+
+## Security & Reliability
+
+<Columns cols={2}>
+  <Card title="Authentication" icon="lock">
+    API key-based access control with secure token management
+  </Card>
+  <Card title="High Availability" icon="server">
+    Redundant infrastructure with automatic failover
+  </Card>
+  <Card title="Data Backup" icon="floppy-disk">
+    Regular backups with point-in-time recovery
+  </Card>
+  <Card title="Monitoring" icon="chart-line">
+    24/7 system monitoring and alerting
+  </Card>
+</Columns>
+
+## Coming Soon
+
+<Note>
+Check out our [roadmap](/roadmap) for upcoming features and improvements.
+</Note>
+
+- **WebSocket streaming** - Real-time market updates
+- **Advanced analytics** - Pre-built statistical functions
+- **Data exports** - CSV and Parquet downloads
+- **Alerting system** - Custom market notifications
+- **GraphQL API** - Alternative query interface
+
+## Support
+
+<Card
+  title="Get Help"
+  icon="life-ring"
+  href="mailto:team@tremor.sh"
+>
+  Questions about features? Contact team@tremor.sh
+</Card>
