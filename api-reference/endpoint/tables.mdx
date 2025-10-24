@@ -1,0 +1,30 @@
+---
+title: 'List Tables'
+openapi: 'GET /api/tables'
+---
+
+Discover the datasets available in Tremor, including historical and latest snapshot tables for Polymarket and Kalshi.
+
+### Query parameters
+
+<ParamField query="with_stats" type="boolean" default="false">
+  Include approximate row counts and column metadata for each table.
+</ParamField>
+
+<ParamField query="refresh" type="boolean" default="false">
+  Bypass the metadata cache and fetch fresh stats from ClickHouse.
+</ParamField>
+
+### Related endpoints
+
+<CardGroup cols={3}>
+  <Card title="Table schema" icon="columns-3" href="/api-reference/endpoint/table-schema">
+    Field names and data types for a specific table
+  </Card>
+  <Card title="Sample data" icon="table" href="/api-reference/endpoint/table-sample">
+    Inspect live rows from any dataset
+  </Card>
+  <Card title="Column stats" icon="chart-bar" href="/api-reference/endpoint/table-stats">
+    Understand ranges, null percentages, and cardinality
+  </Card>
+</CardGroup>

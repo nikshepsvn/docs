@@ -1,0 +1,36 @@
+---
+title: 'Semantic Market Search'
+openapi: 'POST /api/markets/semantic-search'
+---
+
+Find relevant markets across Polymarket and Kalshi using vector similarity search. Tremor embeds market metadata and compares it against the embedding of your natural-language query.
+
+<Info>
+The embedding service runs inside Tremor—no additional API keys required. Requests are limited to <strong>30 per minute</strong> per API key.
+</Info>
+
+### Request parameters
+
+<ParamField body="query" type="string" required>
+  Natural-language description of the markets you want to find.
+</ParamField>
+
+<ParamField body="limit" type="integer" default="20">
+  Maximum number of markets to return.
+</ParamField>
+
+<ParamField body="platform" type="string">
+  Restrict results to <code>polymarket</code> or <code>kalshi</code>. Omit for a blended ranking.
+</ParamField>
+
+<ParamField body="min_volume" type="number">
+  Filter out thin markets based on 24h volume.
+</ParamField>
+
+<ParamField body="only_active" type="boolean" default="false">
+  Return only markets that are still trading.
+</ParamField>
+
+### Response highlights
+
+Each result includes similarity scores, current liquidity metrics, and price quotes (bid/ask for Kalshi, yes/no probabilities for Polymarket). Use these signals to build recommendation systems or to seed arbitrage scanners.

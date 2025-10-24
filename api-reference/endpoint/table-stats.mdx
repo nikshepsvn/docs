@@ -1,0 +1,18 @@
+---
+title: 'Column Statistics'
+openapi: 'GET /api/table/{namespace}/{table}/stats'
+---
+
+Retrieve column-level metrics—min/max values, null counts, cardinality buckets—to guide query writers and UI filters.
+
+<ParamField path="namespace" type="string" required>
+  Data source namespace to inspect (for example <code>polymarket</code> or <code>kalshi</code>).
+</ParamField>
+
+<ParamField path="table" type="string" required>
+  Table name within the namespace (such as <code>events</code>, <code>markets</code>, or <code>events_latest</code>).
+</ParamField>
+
+<Tip>
+Tremor samples the first 20 columns to keep statistics responsive. If you need deeper profiling, run aggregate queries through <a href="/api-reference/endpoint/query">POST /api/query</a>.
+</Tip>

@@ -43,11 +43,44 @@
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "Queries",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete"
+              "api-reference/endpoint/query",
+              "api-reference/endpoint/query-validate",
+              "api-reference/endpoint/query-stats",
+              "api-reference/endpoint/query-stats-single"
+            ]
+          },
+          {
+            "group": "Metadata",
+            "pages": [
+              "api-reference/endpoint/tables",
+              "api-reference/endpoint/table-schema",
+              "api-reference/endpoint/table-sample",
+              "api-reference/endpoint/table-stats"
+            ]
+          },
+          {
+            "group": "Search & Assistant",
+            "pages": [
+              "api-reference/endpoint/semantic-search",
+              "api-reference/endpoint/assistant"
+            ]
+          },
+          {
+            "group": "Sync Monitoring",
+            "pages": [
+              "api-reference/endpoint/sync-status",
+              "api-reference/endpoint/sync-history",
+              "api-reference/endpoint/sync-metrics"
+            ]
+          },
+          {
+            "group": "API Keys",
+            "pages": [
+              "api-reference/endpoint/keys-create",
+              "api-reference/endpoint/keys-list",
+              "api-reference/endpoint/keys-delete"
             ]
           }
         ]

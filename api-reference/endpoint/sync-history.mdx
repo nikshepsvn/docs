@@ -1,0 +1,20 @@
+---
+title: 'Sync History'
+openapi: 'GET /api/sync/history'
+---
+
+Retrieve the most recent ingestion runs with execution timing, row counts, and error metadata.
+
+<ParamField query="limit" type="integer" default="20">
+  Maximum number of runs to return (capped at 500).
+</ParamField>
+
+<ParamField query="source" type="string">
+  Filter to <code>polymarket</code> or <code>kalshi</code>. Leave blank for both.
+</ParamField>
+
+### Use cases
+
+- Drive timeline visualisations showing successful and failed syncs.
+- Audit a specific backfill by filtering on <code>sync_type</code> and <code>scope</code>.
+- Diagnose errors quickly with the <code>error</code> and <code>metadata</code> fields.

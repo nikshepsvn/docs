@@ -1,0 +1,14 @@
+---
+title: 'Saved Query Stats'
+openapi: 'GET /api/query/{query_id}/stats'
+---
+
+Inspect execution metrics for a single saved query. Tremor reports how many times the query ran successfully, the average runtime, and when it last executed.
+
+<ParamField path="query_id" type="string" required>
+  Supabase identifier of the saved query.
+</ParamField>
+
+<Info>
+Ad-hoc queries executed via <code>POST /api/query</code> are tracked with the special ID <code>adhoc</code>, but they are excluded from this endpoint.
+</Info>

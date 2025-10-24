@@ -1,0 +1,21 @@
+---
+title: 'Sync Status'
+openapi: 'GET /api/sync/status'
+---
+
+Monitor ingestion freshness for Kalshi and Polymarket. The response aggregates table row counts, current backfill state, and the most recent successful or failed runs.
+
+<ParamField query="history_limit" type="integer" default="5">
+  Number of historical runs to embed for each source.
+</ParamField>
+
+### Response highlights
+
+- <code>sources.{platform}.status</code> shows <code>syncing</code>, <code>backfilling</code>, <code>error</code>, or <code>idle</code>.
+- <code>sources.{platform}.backfill_offsets</code> exposes backlog progress when replaying history.
+- <code>table_counts</code> includes up-to-date row counts for every physical table.
+- <code>recent_runs</code> mirrors <a href="/api-reference/endpoint/sync-history">/api/sync/history</a> for quick access to recent results.
+
+<Tip>
+Use this endpoint to power health dashboards or alerting. Pair it with <a href="/api-reference/endpoint/sync-metrics">/sync/metrics</a> for long-term cadence trends.
+</Tip>

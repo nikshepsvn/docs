@@ -1,0 +1,10 @@
+---
+title: 'Query Analytics'
+openapi: 'GET /api/queries/stats'
+---
+
+Review execution metrics for saved queries over the last 30 days. The response aggregates runtime, execution count, and the last execution timestamp for each saved query ID.
+
+<Tip>
+To drill into a single saved query, call <a href="/api-reference/endpoint/query-stats-single">GET /api/query/{query_id}/stats</a> with the Supabase query identifier.
+</Tip>

@@ -1,0 +1,22 @@
+---
+title: 'Create API Key'
+openapi: 'POST /api/keys/create'
+---
+
+Issue a new API key for the authenticated user. The full secret is returned only once—store it securely.
+
+<ParamField body="name" type="string" required>
+  Friendly display name, shown in the Tremor dashboard.
+</ParamField>
+
+<ParamField body="user_id" type="string" required>
+  Supabase user identifier. Populate using the <code>sub</code> claim from your session token.
+</ParamField>
+
+<ParamField body="expires_days" type="integer">
+  Optional number of days before the key automatically expires.
+</ParamField>
+
+<Warning>
+Copy the <code>key</code> field from the response immediately. Tremor stores a hashed prefix and cannot recover the secret later.
+</Warning>

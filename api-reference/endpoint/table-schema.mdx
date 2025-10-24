@@ -1,0 +1,18 @@
+---
+title: 'Table Schema'
+openapi: 'GET /api/table/{namespace}/{table}'
+---
+
+Return column names and data types for any dataset. Use this endpoint to power schema browsers and to generate strongly typed query builders.
+
+<ParamField path="namespace" type="string" required>
+  Data source namespace, such as <code>polymarket</code>, <code>kalshi</code>, or <code>internal</code>.
+</ParamField>
+
+<ParamField path="table" type="string" required>
+  Table name within the namespace (for example <code>events</code>, <code>markets_latest</code>, or <code>sync_run_history</code>).
+</ParamField>
+
+<Tip>
+Combine this endpoint with <a href="/api-reference/endpoint/table-stats">column statistics</a> to surface min/max values, distinct counts, and null rates directly in your tools.
+</Tip>

@@ -1,54 +1,390 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Tremor API",
+    "version": "2025-02-01",
+    "description": "Programmatic access to Tremor's prediction market data, query engine, and operational tooling.",
     "license": {
       "name": "MIT"
-    },
-    "version": "1.0.0"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://tremor.sh",
+      "description": "Production"
     }
   ],
-  "security": [
+  "tags": [
     {
-      "bearerAuth": []
+      "name": "Health",
+      "description": "Service status endpoints"
+    },
+    {
+      "name": "Metadata",
+      "description": "Catalog discovery and schema inspection"
+    },
+    {
+      "name": "Queries",
+      "description": "SQL execution and validation"
+    },
+    {
+      "name": "Assistant",
+      "description": "AI-assisted SQL generation"
+    },
+    {
+      "name": "Search",
+      "description": "Semantic market search"
+    },
+    {
+      "name": "Sync",
+      "description": "Data ingestion monitoring"
+    },
+    {
+      "name": "Analytics",
+      "description": "Query analytics"
+    },
+    {
+      "name": "API Keys",
+      "description": "Programmatic key management"
     }
   ],
   "paths": {
-    "/plants": {
+    "/health": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": [
+          "Health"
+        ],
+        "summary": "Service health check",
+        "responses": {
+          "200": {
+            "description": "Service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "catalog_connected": {
+                      "type": "boolean"
+                    },
+                    "warehouse": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp",
+                    "catalog_connected",
+                    "warehouse"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tables": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "List available tables",
         "parameters": [
           {
-            "name": "limit",
+            "name": "with_stats",
             "in": "query",
-            "description": "The maximum number of results to return",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "boolean"
+            },
+            "description": "Include row counts and column metadata"
+          },
+          {
+            "name": "refresh",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Bypass metadata cache"
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTablesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/{namespace}/{table}": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "Get table schema",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Table schema",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/TableSchemaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/{namespace}/{table}/sample": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "Fetch sample rows from a table",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sample data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Table not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/table/{namespace}/{table}/stats": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "Column statistics",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Column statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColumnStatsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Table not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/query": {
+      "post": {
+        "tags": [
+          "Queries"
+        ],
+        "summary": "Execute a SQL query",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Run an ad-hoc query",
+                  "value": {
+                    "query": "SELECT title, yes_probability FROM polymarket_events LIMIT 10"
                   }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,35 +392,57 @@
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "503": {
+            "description": "ClickHouse unavailable"
+          }
+        }
+      }
+    },
+    "/api/query/validate": {
+      "post": {
+        "tags": [
+          "Queries"
+        ],
+        "summary": "Validate a SQL query without executing",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +454,89 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
+    "/api/assistant/generate/stream": {
+      "post": {
+        "tags": [
+          "Assistant"
+        ],
+        "summary": "Generate SQL using the AI assistant (streaming)",
+        "security": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "BearerAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantRequest"
+              }
+            }
+          }
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Server-sent events stream of assistant output",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "example": "data: {\"type\":\"plan\",...}\n\n"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Assistant error"
+          }
+        }
+      }
+    },
+    "/api/markets/semantic-search": {
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Semantic market search",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SemanticSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemanticSearchResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,89 +547,1266 @@
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/api/sync/status": {
+      "get": {
+        "tags": [
+          "Sync"
+        ],
+        "summary": "Live sync status",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "history_limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sync status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sync/history": {
+      "get": {
+        "tags": [
+          "Sync"
+        ],
+        "summary": "Recent sync executions",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "polymarket",
+                "kalshi"
+              ],
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sync history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncHistoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync/metrics": {
+      "get": {
+        "tags": [
+          "Sync"
+        ],
+        "summary": "Historical sync metrics",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregate sync metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncMetricsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/query/{query_id}/stats": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Get stats for a saved query",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "query_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated query stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/queries/stats": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "List stats for all saved queries",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stats for saved queries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/keys/create": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": [
+          "API Keys"
+        ],
+        "summary": "Create a new API key",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/APIKeyCreateRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "New API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/keys/list": {
+      "get": {
+        "tags": [
+          "API Keys"
+        ],
+        "summary": "List API keys for the authenticated user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKeyListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/keys/{key_id}": {
+      "delete": {
+        "tags": [
+          "API Keys"
+        ],
+        "summary": "Revoke an API key",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Key revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "Error": {
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "detail": {
+            "type": "string",
+            "example": "Authentication required"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
+      "AnyValue": {
+        "oneOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "type": "string"
           },
           {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "array",
+            "items": {}
+          },
+          {
+            "type": "null"
           }
         ]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "QueryRequest": {
         "type": "object",
         "properties": {
-          "error": {
+          "query": {
+            "type": "string",
+            "description": "SQL text to execute"
+          },
+          "query_id": {
+            "type": "string",
+            "description": "Identifier of a saved query"
+          },
+          "limit": {
             "type": "integer",
-            "format": "int32"
+            "minimum": 1,
+            "description": "Override default LIMIT"
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueryResult": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnyValue"
+              }
+            }
+          },
+          "row_count": {
+            "type": "integer"
+          },
+          "execution_time_ms": {
+            "type": "number"
+          },
+          "statistics": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "columns",
+          "data",
+          "row_count",
+          "execution_time_ms"
+        ],
+        "additionalProperties": false
+      },
+      "QueryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "result": {
+            "$ref": "#/components/schemas/QueryResult"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "result"
+        ],
+        "additionalProperties": false
+      },
+      "ValidationResponse": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "estimated_rows": {
+            "type": "integer",
+            "nullable": true
+          },
+          "explain": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "valid",
+          "error",
+          "estimated_rows"
+        ],
+        "additionalProperties": false
+      },
+      "ColumnDefinition": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "TableSummary": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "table": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "row_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColumnDefinition"
+            }
+          }
+        },
+        "required": [
+          "namespace",
+          "table",
+          "full_name",
+          "source",
+          "columns"
+        ],
+        "additionalProperties": true
+      },
+      "ListTablesResponse": {
+        "type": "object",
+        "properties": {
+          "tables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TableSummary"
+            }
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tables",
+          "count"
+        ],
+        "additionalProperties": false
+      },
+      "TableSchemaResponse": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "table": {
+            "type": "string"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColumnDefinition"
+            }
+          }
+        },
+        "required": [
+          "namespace",
+          "table",
+          "columns"
+        ],
+        "additionalProperties": false
+      },
+      "SampleResponse": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "table": {
+            "type": "string"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sample_data": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnyValue"
+              }
+            }
+          },
+          "sample_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "namespace",
+          "table",
+          "columns",
+          "sample_data",
+          "sample_size"
+        ],
+        "additionalProperties": false
+      },
+      "ColumnStat": {
+        "type": "object",
+        "properties": {
+          "column": {
+            "type": "string"
+          },
+          "data_type": {
+            "type": "string"
+          },
+          "row_count": {
+            "type": "integer"
+          },
+          "null_count": {
+            "type": "integer"
+          },
+          "min_value": {
+            "$ref": "#/components/schemas/AnyValue"
+          },
+          "max_value": {
+            "$ref": "#/components/schemas/AnyValue"
+          },
+          "avg_value": {
+            "$ref": "#/components/schemas/AnyValue"
+          },
+          "distinct_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "cardinality": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "column",
+          "data_type",
+          "row_count",
+          "null_count"
+        ],
+        "additionalProperties": true
+      },
+      "ColumnStatsResponse": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "table": {
+            "type": "string"
+          },
+          "column_stats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColumnStat"
+            }
+          }
+        },
+        "required": [
+          "namespace",
+          "table",
+          "column_stats"
+        ],
+        "additionalProperties": false
+      },
+      "AssistantMessage": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "AssistantRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "conversation_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssistantMessage"
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "query_writer",
+              "analyst"
+            ],
+            "default": "query_writer"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "SemanticSearchRequest": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "polymarket",
+              "kalshi"
+            ],
+            "nullable": true
+          },
+          "min_volume": {
+            "type": "number",
+            "nullable": true
+          },
+          "only_active": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "SemanticSearchResult": {
+        "type": "object",
+        "properties": {
+          "result_type": {
+            "type": "string",
+            "example": "market"
+          },
+          "platform": {
+            "type": "string",
+            "example": "polymarket"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string",
+            "nullable": true
+          },
+          "ticker": {
+            "type": "string",
+            "nullable": true
+          },
+          "event_ticker": {
+            "type": "string",
+            "nullable": true
+          },
+          "similarity": {
+            "type": "number"
+          },
+          "volume": {
+            "type": "number",
+            "nullable": true
+          },
+          "yes_bid": {
+            "type": "number",
+            "nullable": true
+          },
+          "yes_ask": {
+            "type": "number",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "SemanticSearchResponse": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticSearchResult"
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query",
+          "results",
+          "total"
+        ],
+        "additionalProperties": false
+      },
+      "SyncHistoryEntry": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "example": "polymarket"
+          },
+          "sync_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "nullable": true
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "duration_ms": {
+            "type": "integer",
+            "nullable": true
+          },
+          "events_written": {
+            "type": "integer",
+            "nullable": true
+          },
+          "markets_written": {
+            "type": "integer",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "run_id",
+          "source",
+          "success"
+        ],
+        "additionalProperties": false
+      },
+      "SyncHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncHistoryEntry"
+            }
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "history",
+          "count"
+        ],
+        "additionalProperties": false
+      },
+      "SyncSourceStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "is_backfilling": {
+            "type": "boolean"
+          },
+          "backfill_offsets": {
+            "type": "object"
+          },
+          "open_events_tracked": {
+            "type": "integer"
+          },
+          "last_sync": {
+            "type": "string",
+            "nullable": true
+          },
+          "events_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "markets_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "recent_runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncHistoryEntry"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "SyncStatusResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "active_backfills": {
+            "type": "integer",
+            "nullable": true
+          },
+          "table_counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "sources": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SyncSourceStatus"
+            }
+          },
+          "recent_runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncHistoryEntry"
+            }
+          }
+        },
+        "required": [
+          "timestamp",
+          "table_counts",
+          "sources"
+        ],
+        "additionalProperties": false
+      },
+      "SyncMetricsIntervalStats": {
+        "type": "object",
+        "properties": {
+          "intervals": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "avg_minutes": {
+            "type": "number"
+          },
+          "min_minutes": {
+            "type": "number"
+          },
+          "max_minutes": {
+            "type": "number"
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SyncMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "first_update": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                },
+                "last_update": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                },
+                "total_updates": {
+                  "type": "integer"
+                },
+                "avg_duration_seconds": {
+                  "type": "number"
+                },
+                "intervals": {
+                  "type": "object",
+                  "properties": {
+                    "historical": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "recent": {
+                      "$ref": "#/components/schemas/SyncMetricsIntervalStats"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "metrics"
+        ],
+        "additionalProperties": false
+      },
+      "QueryStats": {
+        "type": "object",
+        "properties": {
+          "execution_count": {
+            "type": "integer"
+          },
+          "avg_runtime_ms": {
+            "type": "number"
+          },
+          "last_executed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "execution_count",
+          "avg_runtime_ms",
+          "last_executed_at"
+        ],
+        "additionalProperties": false
+      },
+      "QueryStatsResponse": {
+        "type": "object",
+        "properties": {
+          "queries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "query_id": {
+                  "type": "string"
+                },
+                "execution_count": {
+                  "type": "integer"
+                },
+                "avg_runtime_ms": {
+                  "type": "number"
+                },
+                "last_executed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "query_id",
+                "execution_count",
+                "avg_runtime_ms",
+                "last_executed_at"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "queries"
+        ],
+        "additionalProperties": false
+      },
+      "APIKeyCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "expires_days": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name",
+          "user_id"
+        ],
+        "additionalProperties": false
+      },
+      "APIKey": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "key_prefix": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_used_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "key_prefix",
+          "name",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "APIKeyListResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "key_prefix": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_used_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "key_prefix",
+                "name",
+                "created_at"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "keys"
+        ],
+        "additionalProperties": false
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
           },
           "message": {
             "type": "string"
           }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+        },
+        "required": [
+          "success",
+          "message"
+        ],
+        "additionalProperties": false
       }
     }
   }

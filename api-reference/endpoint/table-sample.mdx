@@ -1,0 +1,22 @@
+---
+title: 'Sample Rows'
+openapi: 'GET /api/table/{namespace}/{table}/sample'
+---
+
+Grab example rows from any dataset to understand field semantics or build fixtures.
+
+<ParamField path="namespace" type="string" required>
+  Data source namespace, such as <code>polymarket</code> or <code>kalshi</code>.
+</ParamField>
+
+<ParamField path="table" type="string" required>
+  Table name inside the namespace (for example <code>events</code>, <code>markets_latest</code>).
+</ParamField>
+
+<ParamField query="limit" type="integer" default="5">
+  Number of rows to return. The service caps this at 100 per request.
+</ParamField>
+
+<Info>
+Sample requests are rate limited to <strong>60 per minute</strong> per API key.
+</Info>

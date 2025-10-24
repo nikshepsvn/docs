@@ -91,10 +91,10 @@ Use the complete power of SQL:
 
 ### REST API
 
-Programmatic access to all Tremor features:
+Programmatic access to Tremor's data endpoints:
 
 ```bash
-curl -X POST https://api.tremor.sh/query \
+curl -X POST https://tremor.sh/api/query \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -102,27 +102,88 @@ curl -X POST https://api.tremor.sh/query \
   }'
 ```
 
-**API Features:**
-- **No rate limits** - Query as much as you need
-- **API key authentication** - Secure access control
-- **JSON responses** - Easy integration
-- **Batch queries** - Multiple queries in one request
+**API Highlights:**
+- **Per-key rate limiting** - 30 query executions per minute with burst protection
+- **Usage analytics** - Every request is logged, enabling detailed key-level audit trails
+- **Rich JSON responses** - Column metadata and row data are returned together
+- **Dry-run support** - Validate queries before execution with `/api/query/validate`
+
+<Info>
+All endpoints are served from `https://tremor.sh/api`. Authenticate using a Bearer token generated in the Tremor dashboard.
+</Info>
+
+### Query Validation & Explain Plans
+
+Guard production workloads by confirming syntax and reviewing the ClickHouse execution plan before running a query:
+
+```bash
+curl -X POST https://tremor.sh/api/query/validate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "SELECT count() FROM polymarket_events WHERE sync_timestamp >= now() - INTERVAL 1 DAY"
+  }'
+```
+
+The response indicates whether the statement is valid and returns the ClickHouse `EXPLAIN` output for further review.
+
+### Semantic Market Search
+
+Discover related markets using vector similarity search across Kalshi and Polymarket:
+
+```bash
+curl -X POST https://tremor.sh/api/markets/semantic-search \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "election markets with high volume",
+    "platform": "polymarket",
+    "limit": 5,
+    "only_active": true
+  }'
+```
+
+Results are ranked by semantic relevance and include liquidity, price, and recent volume metrics.
+
+### Sync Monitoring & Metrics
+
+Track ingestion health in real time:
+
+- `GET /api/sync/status` reports the latest snapshot, lag, and recent job history
+- `GET /api/sync/history?source=polymarket` returns execution details for recent runs
+- `GET /sync/metrics` aggregates long-term sync cadence and duration statistics
+
+These endpoints power the dashboard's Status page and help operators confirm data freshness.
+
+### API Key Management & Usage Tracking
+
+Create and manage credentials directly through the API:
+
+- `POST /api/keys/create` issues scoped API keys (returning the secret once)
+- `GET /api/keys/list` lists active keys for the authenticated user
+- `DELETE /api/keys/{key_id}` revokes credentials immediately
+
+Admins gain additional visibility via `/api/admin/keys/all` and `/api/admin/keys/{key_id}/usage`, which expose per-endpoint request counts and latency statistics.
 
 ### AI Assistant
 
-Natural language to SQL conversion:
+Natural language to SQL conversion with streaming responses:
 
 <Steps>
   <Step title="Ask a question">
     Type your question in plain English: "Show me the top 10 markets by volume"
   </Step>
   <Step title="Get SQL">
-    The AI assistant generates optimized SQL
+    The AI assistant generates optimized SQL in real time over Server-Sent Events
   </Step>
   <Step title="Execute">
     Review and run the query with one click
   </Step>
 </Steps>
+
+<Info>
+Use `POST /api/assistant/generate/stream` with `mode` set to `query_writer` (default) or `analyst` for commentary plus SQL. This endpoint is rate limited to 20 requests per minute.
+</Info>
 
 ## Data Quality
 
@@ -175,7 +236,7 @@ Tremor uses ClickHouse's **ReplacingMergeTree** engine to ensure:
 import requests
 
 response = requests.post(
-    "https://api.tremor.sh/query",
+    "https://tremor.sh/api/query",
     headers={"Authorization": f"Bearer {API_KEY}"},
     json={"query": "SELECT * FROM polymarket_events LIMIT 10"}
 )
@@ -183,7 +244,7 @@ data = response.json()
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.tremor.sh/query', {
+const response = await fetch('https://tremor.sh/api/query', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${API_KEY}`,
@@ -197,7 +258,7 @@ const data = await response.json();
 ```
 
 ```bash cURL
-curl -X POST https://api.tremor.sh/query \
+curl -X POST https://tremor.sh/api/query \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"query": "SELECT * FROM polymarket_events LIMIT 10"}'

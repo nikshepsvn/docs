@@ -1,0 +1,17 @@
+---
+title: 'Sync Metrics'
+openapi: 'GET /sync/metrics'
+---
+
+Summarise long-term ingestion cadence for each source. Metrics include total successful runs, average duration, and recent interval distributions.
+
+### Response structure
+
+- <code>metrics.{platform}.first_update</code> / <code>last_update</code>: ISO timestamps of the earliest and latest successful runs.
+- <code>metrics.{platform}.total_updates</code>: Number of successful sync cycles recorded.
+- <code>metrics.{platform}.avg_duration_seconds</code>: Average runtime across the entire history.
+- <code>metrics.{platform}.intervals.recent</code>: Recent inter-run intervals in minutes, useful for detecting slippage.
+
+<Tip>
+Combine <code>/sync/metrics</code> with <a href="/api-reference/endpoint/sync-status">/api/sync/status</a> to build service-level objectives (SLO) around data freshness.
+</Tip>

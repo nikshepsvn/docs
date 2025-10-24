@@ -55,7 +55,7 @@ This query returns the top 10 most traded markets on Polymarket.
 Make your first API request using curl:
 
 ```bash
-curl -X POST https://api.tremor.sh/query \
+curl -X POST https://tremor.sh/api/query \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,9 +63,25 @@ curl -X POST https://api.tremor.sh/query \
   }'
 ```
 
+<Info>
+The query endpoint enforces a rate limit of 30 requests per minute per authenticated user or API key. If you receive a `429` response, pause briefly before retrying.
+</Info>
+
 ## 4. Explore the Data
 
 ### Available Tables
+
+Use the metadata endpoints to browse the catalog:
+
+```bash
+curl -X GET "https://tremor.sh/api/tables?with_stats=true" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash
+curl -X GET "https://tremor.sh/api/table/polymarket/events/sample?limit=5" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
 
 <Columns cols={2}>
   <Card title="polymarket_events" icon="chart-pie">
@@ -159,36 +175,22 @@ ORDER BY date DESC;
 
 ## Next Steps
 
-<Columns cols={2}>
+<CardGroup cols={2}>
   <Card
     title="API Reference"
     icon="book"
     href="/api-reference/introduction"
   >
-    Explore the complete API documentation
+    Dive into authentication, endpoints, and response formats
   </Card>
   <Card
-    title="Query Examples"
-    icon="code"
-    href="/essentials/arbitrage-queries"
+    title="Features Overview"
+    icon="chart-mixed"
+    href="/features"
   >
-    Learn advanced query patterns
+    Explore dashboards, AI assistant, semantic search, and monitoring tools
   </Card>
-  <Card
-    title="Architecture"
-    icon="sitemap"
-    href="/essentials/architecture"
-  >
-    Understand how Tremor works
-  </Card>
-  <Card
-    title="Data Sources"
-    icon="database"
-    href="/essentials/data-sources"
-  >
-    Learn about Polymarket and Kalshi data
-  </Card>
-</Columns>
+</CardGroup>
 
 ## Need Help?
 

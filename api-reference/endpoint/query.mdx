@@ -1,0 +1,43 @@
+---
+title: 'Execute SQL Query'
+openapi: 'POST /api/query'
+---
+
+Run ad-hoc or saved SQL statements against the ClickHouse warehouse. This endpoint powers the in-product SQL editor and programmatic integrations.
+
+<Info>
+Requests are rate limited to <strong>30 executions per minute</strong> per authenticated user or API key.
+</Info>
+
+### Request fields
+
+<ParamField body="query" type="string">
+  Raw SQL to execute. Mutually exclusive with <code>query_id</code>.
+</ParamField>
+
+<ParamField body="query_id" type="string">
+  Execute a saved query stored in Supabase. Ignored when <code>query</code> is supplied.
+</ParamField>
+
+<ParamField body="limit" type="integer" default="None">
+  Optional row limit override. Useful when running saved queries with large defaults.
+</ParamField>
+
+### Saved query execution
+
+When you provide <code>query_id</code>, the service fetches the latest SQL from Supabase before execution. Use this flow to keep complex statements version-controlled while reusing the same API call.
+
+### Response structure
+
+- <code>result.columns</code> lists column names in order
+- <code>result.data</code> contains an array of rows (each row is an ordered array)
+- <code>result.execution_time_ms</code> reports end-to-end latency
+- <code>query</code> echoes the executed SQL after namespace rewriting
+
+<Tip>
+Track execution analytics with <a href="/api-reference/endpoint/query-stats">GET /api/query/{query_id}/stats</a> or list all saved query metrics via <a href="/api-reference/endpoint/query-stats">GET /api/queries/stats</a>.
+</Tip>
+
+### Validate before running
+
+Use <a href="/api-reference/endpoint/query-validate">POST /api/query/validate</a> to confirm syntax and inspect ClickHouse <code>EXPLAIN</code> output without incurring compute.

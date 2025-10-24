@@ -1,0 +1,34 @@
+---
+title: 'AI Assistant (Streaming)'
+openapi: 'POST /api/assistant/generate/stream'
+---
+
+Convert natural-language questions into SQL with live progress updates. The endpoint emits <strong>Server-Sent Events (SSE)</strong> so you can render status updates and final SQL in real time.
+
+<Info>
+Rate limit: <strong>20 requests per minute</strong> per API key. The <code>mode</code> field toggles between <code>query_writer</code> (default) and <code>analyst</code>, which adds commentary and requires an Exa key for enrichment.
+</Info>
+
+### Request fields
+
+<ParamField body="message" type="string" required>
+  User prompt or question.
+</ParamField>
+
+<ParamField body="mode" type="string" default="query_writer">
+  Either <code>query_writer</code> for SQL only or <code>analyst</code> for SQL plus narrative analysis.
+</ParamField>
+
+<ParamField body="conversation_history" type="array">
+  Optional prior turns to maintain context. Supply objects with <code>role</code> and <code>content</code> fields.
+</ParamField>
+
+### Stream handling
+
+- Each SSE event is emitted as <code>data: {"type": "...", "payload": ...}</code>.
+- Watch for <code>type=final</code> to retrieve the generated SQL and an execution-ready query ID.
+- Treat <code>type=error</code> events as terminal; the connection closes immediately afterward.
+
+<Tip>
+Pair this endpoint with <a href="/api-reference/endpoint/query">POST /api/query</a> to run the generated SQL automatically once the stream completes.
+</Tip>

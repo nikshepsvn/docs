@@ -1,0 +1,12 @@
+---
+title: 'List API Keys'
+openapi: 'GET /api/keys/list'
+---
+
+Return all active API keys for the authenticated user, including creation timestamps and the most recent usage time.
+
+<Info>
+Keys are filtered by <code>user_id</code> server-side; the endpoint never exposes other users' credentials.
+</Info>
+
+Use this endpoint to populate account settings pages or to show when a key was last used.

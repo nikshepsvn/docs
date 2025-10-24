@@ -1,0 +1,23 @@
+---
+title: 'Validate SQL'
+openapi: 'POST /api/query/validate'
+---
+
+Check SQL syntax and retrieve the ClickHouse execution plan without running the query. Tremor rewrites namespaces (for example <code>polymarket.events</code> to <code>polymarket_events</code>) before validation, so the <code>explain</code> output matches the actual execution environment.
+
+<Info>
+Validation requests are capped at <strong>60 per minute</strong> per authenticated user or API key.
+</Info>
+
+### Response fields
+
+- <code>valid</code>: Indicates whether the statement can execute successfully
+- <code>error</code>: Contains the validation failure message if <code>valid</code> is <code>false</code>
+- <code>explain</code>: Raw ClickHouse <code>EXPLAIN</code> output you can surface in tooling
+- <code>estimated_rows</code>: Reserved for future row-count estimation
+
+### Usage tips
+
+- Call this endpoint from editors or CI pipelines before submitting expensive jobs.
+- Use together with <a href="/api-reference/endpoint/query">POST /api/query</a> to show plan previews in your application.
+- Handle <code>valid=false</code> responses the same way you would handle a 400 error from the execution endpoint.
