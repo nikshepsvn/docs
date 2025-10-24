@@ -37,7 +37,7 @@ data: {"type":"final","payload":{"query_id":"550e8400-e29b-41d4-a716-44665544000
 
 ### Stream handling
 
-- Each SSE event is emitted as <code>data: {"type": "...", "payload": ...}</code>.
+- Each SSE event is emitted as <code>data: {`{"type": "...", "payload": ...}`}</code>.
 - Watch for <code>type=final</code> to retrieve the generated SQL and an execution-ready query ID.
 - Treat <code>type=error</code> events as terminal; the connection closes immediately afterward.
 
