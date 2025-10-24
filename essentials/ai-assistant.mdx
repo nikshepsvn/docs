@@ -1,0 +1,74 @@
+---
+title: 'AI Assistant'
+description: 'Generate SQL with Claude-powered agents and integrate streaming responses into your tools'
+icon: 'wand-magic-sparkles'
+---
+
+Tremor’s AI assistant translates natural-language questions into executable SQL. The service runs on Anthropic Claude with Tremor-specific tooling for schema discovery and validation.
+
+## Choose the Right Mode
+
+<CardGroup cols={2}>
+  <Card title="Query Writer" icon="terminal">
+    Default mode focused on generating optimized SQL. Ideal for analysts who want a ready-to-run statement.
+  </Card>
+  <Card title="Analyst" icon="chart-simple">
+    Adds written commentary and requires an Exa API key for external research augmentation.
+  </Card>
+</CardGroup>
+
+Select the mode by setting the `mode` field in the request body (`query_writer` or `analyst`).
+
+## Streaming Integration
+
+`POST /api/assistant/generate/stream` emits **Server-Sent Events (SSE)** so you can render incremental updates:
+
+```bash
+curl -N -X POST https://tremor.sh/api/assistant/generate/stream \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Show the highest-volume AI regulation markets this week",
+    "mode": "query_writer"
+  }'
+```
+
+Each event follows the format:
+
+```
+data: {"type":"plan","payload":{"step":"Reviewing schema"}}
+
+data: {"type":"sql","payload":{"query":"SELECT ..."}}
+
+data: {"type":"final","payload":{"query_id":"...","sql":"SELECT ..."}}
+```
+
+<Tip>
+Listen for `type=final` to retrieve the finished SQL. Handle `type=error` as a terminal state.
+</Tip>
+
+## Guardrails & Validation
+
+Behind the scenes the assistant calls:
+
+- `GET /api/tables` and `/api/table/{namespace}/{table}` for schema metadata  
+- `POST /api/query/validate` to confirm syntax  
+- Optional semantic search utilities when your prompt references similar markets
+
+This orchestration ensures generated statements are executable and scoped to Tremor’s datasets.
+
+## Rate Limits & Cost Awareness
+
+- 20 assistant requests per minute per API key  
+- Streaming responses return within ~3–6 seconds for typical prompts  
+- Claude usage is metered on Tremor’s side, so high-frequency automation should cache outputs when possible
+
+## Productive Workflows
+
+- **Explain existing SQL**: add conversation history containing the original query so the assistant can annotate or optimize it.  
+- **Iterate on prompts**: supply previous turns via `conversation_history` to refine results without losing context.  
+- **Auto-execution**: chain the assistant with `/api/query` once a `final` event arrives to deliver charts or dashboards on the fly.
+
+---
+
+See the [API reference entry](/api-reference/endpoint/assistant) for exact response fields, or pair the assistant with [query recipes](/essentials/query-recipes) when you need deterministic baselines.

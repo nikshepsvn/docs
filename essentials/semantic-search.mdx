@@ -1,0 +1,79 @@
+---
+title: 'Semantic Search'
+description: 'Discover related prediction markets with Tremor’s vector embeddings'
+icon: 'magnifying-glass'
+---
+
+Semantic search helps you uncover markets related to a topic, even when titles differ. Tremor maintains embeddings for Polymarket and Kalshi using Qwen 8B vectors served through DeepInfra.
+
+## Run a Search
+
+```bash
+curl -X POST https://tremor.sh/api/markets/semantic-search \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "election markets with high volume",
+    "platform": "polymarket",
+    "limit": 5,
+    "only_active": true
+  }'
+```
+
+### Request fields
+
+- `query`: Natural-language description of what you need (required)  
+- `platform`: Optional filter (`polymarket` or `kalshi`)  
+- `limit`: Defaults to 20; capped at 50  
+- `min_volume`: Screen out thin markets  
+- `only_active`: Return only markets still trading
+
+## Response Primer
+
+Each result includes similarity scores plus live market metrics:
+
+```json
+{
+  "result_type": "market",
+  "platform": "polymarket",
+  "title": "Will the EU pass an AI Act by 2025?",
+  "category": "Politics",
+  "ticker": "ai-act-2025",
+  "similarity": 0.81,
+  "volume": 123456.78,
+  "yes_bid": 0.62,
+  "yes_ask": 0.64,
+  "status": "active"
+}
+```
+
+Use the `similarity` score (1.0 is a perfect match) to rank or threshold results.
+
+## Enrich with SQL
+
+Once you have a shortlist, feed market identifiers into SQL queries for deeper analysis:
+
+```sql
+SELECT
+  m.title,
+  m.yes_probability,
+  m.volume_24hr,
+  m.liquidity
+FROM polymarket_events_latest m
+WHERE m.id IN {{comma-separated IDs from semantic search}}
+ORDER BY m.volume_24hr DESC;
+```
+
+<Tip>
+Combine with the [Query Recipes](/essentials/query-recipes#semantic-search-booster) snippet to merge vector results and historical snapshots.
+</Tip>
+
+## How It Works
+
+- Embeddings are refreshed continuously via the `railway-sync` workers.  
+- Tremor stores vectors in ClickHouse tables (`*_market_embeddings`) for sub-200 ms search latency.  
+- `cosineDistance` scores return similarity; Tremor converts to `1 - distance` before responding.
+
+---
+
+See the [API reference](/api-reference/endpoint/semantic-search) for full parameter and schema details.

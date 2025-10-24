@@ -1,0 +1,97 @@
+---
+title: 'API Access Guide'
+description: 'Execute Tremor queries programmatically with best practices for rate limits, validation, and key management'
+icon: 'terminal'
+---
+
+Tremor’s REST API exposes the same ClickHouse-backed query engine that powers the dashboard. This guide summarizes authentication, rate limits, validation workflows, and usage analytics.
+
+## Authenticate with API Keys
+
+Generate an API key from the Tremor dashboard (`Settings → API Keys`) and include it as a Bearer token:
+
+```bash
+curl -X POST https://tremor.sh/api/query \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "SELECT title, yes_probability FROM polymarket_events LIMIT 10"
+  }'
+```
+
+<Warning>
+Keys are shown only once during creation. Rotate compromised keys immediately via `/api/keys/{key_id}`.
+</Warning>
+
+## Rate Limits & Usage Tracking
+
+- `POST /api/query`: 30 executions per minute per key/user  
+- Metadata endpoints (`/api/tables`, `/api/table/...`): 60 requests per minute  
+- `POST /api/assistant/generate/stream`: 20 requests per minute  
+
+Every call is recorded with latency and status code, enabling detailed analytics through `/api/admin/keys/{key_id}/usage` (admin) and surfacing “last used” timestamps in `/api/keys/list`.
+
+## Validate Before Execution
+
+Dry-run queries with `/api/query/validate` to catch syntax issues and review ClickHouse’s execution plan:
+
+```bash
+curl -X POST https://tremor.sh/api/query/validate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "SELECT count() FROM polymarket_events WHERE sync_timestamp >= now() - INTERVAL 1 DAY"
+  }'
+```
+
+The response includes:
+
+- `valid`: Boolean flag  
+- `error`: Validation failure details (if any)  
+- `explain`: Raw ClickHouse plan text
+
+## Response Structure
+
+Query responses return column metadata alongside row data:
+
+```json
+{
+  "success": true,
+  "result": {
+    "columns": ["title", "yes_probability", "volume_24hr"],
+    "data": [
+      ["Election Market A", 0.63, 152345.77],
+      ["Election Market B", 0.58, 101234.11]
+    ],
+    "row_count": 2,
+    "execution_time_ms": 146,
+    "statistics": {
+      "elapsed": 0.143,
+      "rows_read": 20000
+    }
+  },
+  "query": "SELECT title, yes_probability, volume_24hr FROM polymarket_events LIMIT 2"
+}
+```
+
+## Manage Keys Programmatically
+
+Tremor exposes endpoints for end-to-end key lifecycle operations:
+
+<CardGroup cols={3}>
+  <Card title="Create" icon="plus" href="/api-reference/endpoint/keys-create">
+    `POST /api/keys/create`
+  </Card>
+  <Card title="List" icon="list" href="/api-reference/endpoint/keys-list">
+    `GET /api/keys/list`
+  </Card>
+  <Card title="Revoke" icon="ban" href="/api-reference/endpoint/keys-delete">
+    `DELETE /api/keys/{key_id}`
+  </Card>
+</CardGroup>
+
+Use the `key_prefix` to identify keys in logs without exposing full secrets.
+
+---
+
+Next stop: explore [Query Recipes](/essentials/query-recipes) or wire up live dashboards using the `/api/query` endpoint.

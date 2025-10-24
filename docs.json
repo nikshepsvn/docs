@@ -26,7 +26,23 @@
             "pages": [
               "index",
               "quickstart",
-              "features",
+              "features"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "essentials/api-access",
+              "essentials/ai-assistant",
+              "essentials/semantic-search",
+              "essentials/sync-monitoring",
+              "essentials/data-quality",
+              "essentials/query-recipes"
+            ]
+          },
+          {
+            "group": "Contributors",
+            "pages": [
               "development"
             ]
           }

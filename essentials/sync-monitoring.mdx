@@ -1,0 +1,64 @@
+---
+title: 'Sync Monitoring'
+description: 'Track Tremor ingestion pipelines and ensure data freshness'
+icon: 'clock-rotate-left'
+---
+
+Tremor continuously syncs Polymarket and Kalshi data every five minutes. Use these endpoints to monitor health, detect backfills, and surface operational metrics.
+
+## Live Status Snapshot
+
+```bash
+curl -X GET "https://tremor.sh/api/sync/status?history_limit=5" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Key fields:
+
+- `sources.{platform}.status`: `syncing`, `backfilling`, `idle`, or `error`  
+- `sources.{platform}.open_events_tracked`: Active markets currently monitored  
+- `sources.{platform}.backfill_offsets`: Progress when replaying historical data  
+- `table_counts`: Row counts for each physical table
+
+<Tip>
+Alert when `status=error` or when `last_sync` exceeds your freshness SLO.
+</Tip>
+
+## Recent Execution History
+
+```bash
+curl -X GET "https://tremor.sh/api/sync/history?source=polymarket&limit=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Use the response to:
+
+- Audit duration spikes (`duration_ms`)  
+- Track written rows (`events_written`, `markets_written`)  
+- Inspect `error` payloads for failed runs  
+- Render Gantt-style timelines with `started_at` and `completed_at`
+
+## Long-Term Metrics
+
+```bash
+curl -X GET https://tremor.sh/sync/metrics \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+The metrics object summarizes:
+
+- First/last successful update timestamps  
+- Total successful runs per source  
+- Average duration in seconds  
+- Recent interval distribution (min/avg/max) for the last 100 runs  
+- Historical percentile stats (median, p95, p99) to form SLO baselines
+
+## Dashboards & Automation Ideas
+
+- **Status page**: Show `status`, `last_sync`, and `active_backfills` to keep traders informed.  
+- **Pager duty**: Trigger alerts when `intervals.recent.max_minutes` breaches thresholds.  
+- **Capacity planning**: Compare `events_written` vs. `markets_written` growth week over week.
+
+---
+
+For schema-level insights, pair these endpoints with [Column Statistics](/api-reference/endpoint/table-stats) and the [Sync API reference group](/api-reference/endpoint/sync-status).

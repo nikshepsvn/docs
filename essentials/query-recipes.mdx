@@ -1,0 +1,118 @@
+---
+title: 'Query Recipes'
+description: 'Reusable SQL patterns for Tremor datasets'
+icon: 'code'
+---
+
+Jump-start your analysis with copy-ready SQL snippets. Each recipe is tuned for Tremor’s ClickHouse schema and can be pasted directly into the dashboard or executed via the API.
+
+## Cross-Platform Arbitrage
+
+```sql
+SELECT
+  p.title,
+  p.yes_probability AS polymarket_yes,
+  k.yes_probability AS kalshi_yes,
+  ABS(p.yes_probability - k.yes_probability) AS spread,
+  p.volume_24hr AS polymarket_volume,
+  k.volume_24hr AS kalshi_volume
+FROM polymarket_events p
+INNER JOIN kalshi_events k
+  ON similarity(p.title, k.title) > 0.8
+WHERE spread > 0.05
+  AND p.active = true
+  AND k.active = true
+ORDER BY spread DESC
+LIMIT 20;
+```
+
+<Tip>
+Adjust the `similarity` threshold to tighten or loosen the title match. For faster runs, add `AND p.sync_timestamp >= now() - INTERVAL 1 DAY`.
+</Tip>
+
+## Market Timeline Deep Dive
+
+```sql
+SELECT
+  sync_timestamp,
+  yes_probability,
+  volume_24hr,
+  liquidity
+FROM polymarket_events
+WHERE id = 'your-market-id'
+  AND sync_timestamp >= now() - INTERVAL 7 DAY
+ORDER BY sync_timestamp DESC;
+```
+
+<Info>
+Swap in a Kalshi market by joining on `kalshi_events` and using `event_ticker` or `series_ticker`.
+</Info>
+
+## Daily Sentiment Rollup
+
+```sql
+SELECT
+  toDate(sync_timestamp) AS snapshot_date,
+  AVG(yes_probability) AS avg_yes_probability,
+  SUM(volume_24hr) AS total_volume,
+  COUNT() AS active_markets
+FROM polymarket_events
+WHERE active = true
+  AND sync_timestamp >= now() - INTERVAL 30 DAY
+GROUP BY snapshot_date
+ORDER BY snapshot_date DESC;
+```
+
+<Tip>
+Group by `category` or `topic` to compare sentiment across themes.
+</Tip>
+
+## High-Liquidity Opportunities
+
+```sql
+SELECT
+  title,
+  liquidity,
+  yes_probability,
+  volume_24hr,
+  similarity(title, 'election') AS relevance
+FROM polymarket_events
+WHERE active = true
+  AND liquidity > 50000
+ORDER BY relevance DESC, liquidity DESC
+LIMIT 25;
+```
+
+Use this to surface actively trading questions that match a topic of interest.
+
+## Semantic Search Booster
+
+Pair the semantic search endpoint with a follow-up SQL query to inspect the live order book.
+
+```sql
+WITH ranked_markets AS (
+  SELECT
+    market_id,
+    similarity,
+    ROW_NUMBER() OVER (ORDER BY similarity DESC) AS rank
+  FROM input('market_id String, similarity Float64')
+)
+SELECT
+  r.rank,
+  m.title,
+  m.yes_probability,
+  m.volume_24hr,
+  m.liquidity
+FROM ranked_markets r
+JOIN polymarket_events_latest m
+  ON r.market_id = m.id
+ORDER BY r.rank;
+```
+
+<Note>
+Feed the `market_id` and `similarity` fields from `/api/markets/semantic-search` into the `input` clause to enrich the vector results with latest market stats.
+</Note>
+
+---
+
+Looking for something specific? Reach out at [team@tremor.sh](mailto:team@tremor.sh) and we’ll expand this library.

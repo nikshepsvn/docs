@@ -125,53 +125,16 @@ FROM kalshi_events;
 
 ## 5. Try Advanced Queries
 
-### Find Cross-Platform Arbitrage
+Ready to go beyond the basics? Explore battle-tested SQL patterns—arbitrage screens, sentiment rollups, liquidity scans, and more—in our dedicated recipe collection:
 
-```sql
-SELECT
-  p.title,
-  p.yes_probability as polymarket_yes,
-  k.yes_probability as kalshi_yes,
-  ABS(p.yes_probability - k.yes_probability) as spread,
-  p.volume_24hr as poly_volume,
-  k.volume_24hr as kalshi_volume
-FROM polymarket_events p
-INNER JOIN kalshi_events k ON similarity(p.title, k.title) > 0.8
-WHERE spread > 0.05
-  AND p.active = true
-  AND k.active = true
-ORDER BY spread DESC
-LIMIT 20;
-```
-
-### Track Market Movement Over Time
-
-```sql
-SELECT
-  sync_timestamp,
-  yes_probability,
-  volume_24hr,
-  liquidity
-FROM polymarket_events
-WHERE id = 'your-market-id'
-  AND sync_timestamp >= now() - INTERVAL 7 DAY
-ORDER BY sync_timestamp DESC;
-```
-
-### Analyze Market Sentiment
-
-```sql
-SELECT
-  DATE(sync_timestamp) as date,
-  AVG(yes_probability) as avg_yes_prob,
-  SUM(volume_24hr) as total_volume,
-  COUNT(*) as active_markets
-FROM polymarket_events
-WHERE active = true
-  AND sync_timestamp >= now() - INTERVAL 30 DAY
-GROUP BY date
-ORDER BY date DESC;
-```
+<Card
+  title="Query Recipes"
+  icon="code"
+  href="/essentials/query-recipes"
+  horizontal
+>
+  Copy-ready SQL for common Tremor analyses.
+</Card>
 
 ## Next Steps
 

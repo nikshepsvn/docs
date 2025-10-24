@@ -1,285 +1,103 @@
 ---
 title: "Features"
-description: "Comprehensive overview of Tremor's capabilities"
+description: "What Tremor delivers for prediction market analysts and builders"
 ---
 
 # Tremor Features
 
-Tremor provides a complete data infrastructure for prediction market analysis, trading, and research.
+Tremor combines high-frequency market snapshots, a low-latency SQL engine, and AI-assisted tooling so you can move from question to insight in seconds.
 
 ## Data Coverage
 
-### 166,000+ Markets Tracked
-
-<Info>
-Tremor maintains comprehensive coverage across both Polymarket and Kalshi platforms.
-</Info>
-
 <Columns cols={2}>
   <Card title="Polymarket" icon="chart-pie">
-    - Decentralized prediction markets
-    - Complete market metadata
-    - Real-time price updates
-    - Historical snapshots
+    - Full event and market history since launch  
+    - Liquidity, volume, and pricing every five minutes  
+    - Topic and category metadata for segmentation
   </Card>
   <Card title="Kalshi" icon="landmark">
-    - CFTC-regulated markets
-    - Event contracts
-    - Settlement data
-    - Market mechanics
+    - Regulated event contracts with settlement data  
+    - Order-book metrics (bid/ask, open interest)  
+    - Series and ticker mappings for macro research
   </Card>
 </Columns>
 
-## Historical Data
+<Info>
+Need guarantees on freshness and retention? Review the [Data Quality guide](/essentials/data-quality).
+</Info>
 
-### 5-Minute Snapshots
+## Snapshot Cadence
 
-Every market is captured every 5 minutes, providing:
+- 5-minute sync intervals with automatic retries  
+- `_latest` views surface the freshest state per market  
+- Historical tables (`*_events`, `*_markets`) preserve every snapshot for backtesting
 
-- **Unlimited retention** - Never lose historical data
-- **Time-travel queries** - Analyze any point in time
-- **Trend analysis** - Track market movements
-- **Backtesting** - Test trading strategies
+## Platform Highlights
 
-```sql
--- Example: View market history for the past week
-SELECT
-  sync_timestamp,
-  yes_probability,
-  volume_24hr,
-  liquidity
-FROM polymarket_events
-WHERE id = 'your-market-id'
-  AND sync_timestamp >= now() - INTERVAL 7 DAY
-ORDER BY sync_timestamp;
-```
-
-## Query Performance
-
-### Sub-200ms Response Times
-
-<Tip>
-Powered by ClickHouse, a columnar database optimized for analytical queries.
-</Tip>
-
-**Performance characteristics:**
-- **Fast aggregations** - Process millions of rows in milliseconds
-- **Time-series optimized** - Efficient handling of historical data
-- **Parallel processing** - Multi-core query execution
-- **Smart caching** - Frequently accessed data stays hot
-
-### Full SQL Support
-
-Use the complete power of SQL:
-
-<Columns cols={2}>
-  <Card title="Joins" icon="link">
-    Cross-platform market comparison and arbitrage detection
+<Columns cols={3}>
+  <Card title="SQL Editor" icon="terminal">
+    Run complex analyses with auto-complete, schema explorer, and execution history.
   </Card>
-  <Card title="Aggregations" icon="chart-bar">
-    Statistical analysis and trend calculations
+  <Card title="AI Assistant" icon="wand-magic-sparkles">
+    Claude-powered agent that turns natural language into vetted SQL.
   </Card>
-  <Card title="Window Functions" icon="window">
-    Moving averages and time-series analysis
+  <Card title="Live Dashboards" icon="chart-mixed">
+    EventsPulse and KalshiPulse spotlight shocks, toss-ups, and liquidity surges.
   </Card>
-  <Card title="CTEs" icon="code-branch">
-    Complex multi-step queries with readability
+  <Card title="Semantic Search" icon="magnifying-glass">
+    Vector embeddings uncover cross-platform analogs with sub-200 ms latency.
+  </Card>
+  <Card title="Usage Analytics" icon="chart-bar">
+    Track API key performance and query trends across your team.
+  </Card>
+  <Card title="Sync Monitoring" icon="clock-rotate-left">
+    Audit ingestion status, backfills, and historical cadence via dedicated endpoints.
   </Card>
 </Columns>
 
-## API Access
+## Go Deeper
 
-### REST API
-
-Programmatic access to Tremor's data endpoints:
-
-```bash
-curl -X POST https://tremor.sh/api/query \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "SELECT * FROM polymarket_events LIMIT 10"
-  }'
-```
-
-**API Highlights:**
-- **Per-key rate limiting** - 30 query executions per minute with burst protection
-- **Usage analytics** - Every request is logged, enabling detailed key-level audit trails
-- **Rich JSON responses** - Column metadata and row data are returned together
-- **Dry-run support** - Validate queries before execution with `/api/query/validate`
-
-<Info>
-All endpoints are served from `https://tremor.sh/api`. Authenticate using a Bearer token generated in the Tremor dashboard.
-</Info>
-
-### Query Validation & Explain Plans
-
-Guard production workloads by confirming syntax and reviewing the ClickHouse execution plan before running a query:
-
-```bash
-curl -X POST https://tremor.sh/api/query/validate \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "SELECT count() FROM polymarket_events WHERE sync_timestamp >= now() - INTERVAL 1 DAY"
-  }'
-```
-
-The response indicates whether the statement is valid and returns the ClickHouse `EXPLAIN` output for further review.
-
-### Semantic Market Search
-
-Discover related markets using vector similarity search across Kalshi and Polymarket:
-
-```bash
-curl -X POST https://tremor.sh/api/markets/semantic-search \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "election markets with high volume",
-    "platform": "polymarket",
-    "limit": 5,
-    "only_active": true
-  }'
-```
-
-Results are ranked by semantic relevance and include liquidity, price, and recent volume metrics.
-
-### Sync Monitoring & Metrics
-
-Track ingestion health in real time:
-
-- `GET /api/sync/status` reports the latest snapshot, lag, and recent job history
-- `GET /api/sync/history?source=polymarket` returns execution details for recent runs
-- `GET /sync/metrics` aggregates long-term sync cadence and duration statistics
-
-These endpoints power the dashboard's Status page and help operators confirm data freshness.
-
-### API Key Management & Usage Tracking
-
-Create and manage credentials directly through the API:
-
-- `POST /api/keys/create` issues scoped API keys (returning the secret once)
-- `GET /api/keys/list` lists active keys for the authenticated user
-- `DELETE /api/keys/{key_id}` revokes credentials immediately
-
-Admins gain additional visibility via `/api/admin/keys/all` and `/api/admin/keys/{key_id}/usage`, which expose per-endpoint request counts and latency statistics.
-
-### AI Assistant
-
-Natural language to SQL conversion with streaming responses:
-
-<Steps>
-  <Step title="Ask a question">
-    Type your question in plain English: "Show me the top 10 markets by volume"
-  </Step>
-  <Step title="Get SQL">
-    The AI assistant generates optimized SQL in real time over Server-Sent Events
-  </Step>
-  <Step title="Execute">
-    Review and run the query with one click
-  </Step>
-</Steps>
-
-<Info>
-Use `POST /api/assistant/generate/stream` with `mode` set to `query_writer` (default) or `analyst` for commentary plus SQL. This endpoint is rate limited to 20 requests per minute.
-</Info>
-
-## Data Quality
-
-### Automatic Deduplication
-
-Tremor uses ClickHouse's **ReplacingMergeTree** engine to ensure:
-
-- No duplicate snapshots
-- Consistent data across queries
-- Efficient storage
-- Accurate historical records
-
-### Data Freshness
-
-- **5-minute sync interval** - Near real-time data
-- **Automatic retries** - Resilient data collection
-- **Health monitoring** - Proactive issue detection
-- **Status dashboard** - Visibility into sync status
+<CardGroup cols={3}>
+  <Card title="API Access" icon="terminal" href="/essentials/api-access">
+    Authentication, rate limits, validation, and key lifecycle.
+  </Card>
+  <Card title="AI Assistant" icon="wand-magic-sparkles" href="/essentials/ai-assistant">
+    Streaming integration tips and orchestration details.
+  </Card>
+  <Card title="Semantic Search" icon="magnifying-glass" href="/essentials/semantic-search">
+    Discover related markets with embeddings and follow-up SQL.
+  </Card>
+  <Card title="Sync Monitoring" icon="clock-rotate-left" href="/essentials/sync-monitoring">
+    Keep an eye on ingestion health and set freshness alerts.
+  </Card>
+  <Card title="Data Quality" icon="shield-check" href="/essentials/data-quality">
+    Snapshot retention, deduplication, and reliability practices.
+  </Card>
+  <Card title="Query Recipes" icon="code" href="/essentials/query-recipes">
+    Copy-ready SQL patterns for trading and research.
+  </Card>
+</CardGroup>
 
 ## Use Cases
 
 <Columns cols={3}>
   <Card title="Arbitrage Trading" icon="scale-balanced">
-    Identify price discrepancies across platforms for profitable trades
+    Compare Polymarket and Kalshi odds to surface spread opportunities.
   </Card>
   <Card title="Market Research" icon="magnifying-glass-chart">
-    Analyze forecasting accuracy and market sentiment
+    Track sentiment shifts and forecast accuracy over time.
   </Card>
   <Card title="Risk Analysis" icon="shield-halved">
-    Assess market volatility and liquidity risks
+    Monitor volatility, liquidity, and exposure across topics.
   </Card>
-  <Card title="Strategy Backtesting" icon="clock-rotate-left">
-    Test trading strategies against historical data
-  </Card>
-  <Card title="Trend Detection" icon="arrow-trend-up">
-    Identify emerging markets and topics
+  <Card title="Backtesting" icon="clock-rotate-left">
+    Replay historical snapshots to validate trading strategies.
   </Card>
   <Card title="Custom Dashboards" icon="chart-line">
-    Build real-time monitoring interfaces
+    Power BI, Mode, and bespoke apps via Tremor’s REST API.
   </Card>
-</Columns>
-
-## Integration
-
-### Developer-Friendly
-
-<CodeGroup>
-
-```python Python
-import requests
-
-response = requests.post(
-    "https://tremor.sh/api/query",
-    headers={"Authorization": f"Bearer {API_KEY}"},
-    json={"query": "SELECT * FROM polymarket_events LIMIT 10"}
-)
-data = response.json()
-```
-
-```javascript JavaScript
-const response = await fetch('https://tremor.sh/api/query', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${API_KEY}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    query: 'SELECT * FROM polymarket_events LIMIT 10'
-  })
-});
-const data = await response.json();
-```
-
-```bash cURL
-curl -X POST https://tremor.sh/api/query \
-  -H "Authorization: Bearer $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "SELECT * FROM polymarket_events LIMIT 10"}'
-```
-
-</CodeGroup>
-
-## Security & Reliability
-
-<Columns cols={2}>
-  <Card title="Authentication" icon="lock">
-    API key-based access control with secure token management
-  </Card>
-  <Card title="High Availability" icon="server">
-    Redundant infrastructure with automatic failover
-  </Card>
-  <Card title="Data Backup" icon="floppy-disk">
-    Regular backups with point-in-time recovery
-  </Card>
-  <Card title="Monitoring" icon="chart-line">
-    24/7 system monitoring and alerting
+  <Card title="Alerting" icon="bell">
+    Trigger notifications when probabilities, liquidity, or sync cadences change.
   </Card>
 </Columns>
 
@@ -287,58 +105,19 @@ curl -X POST https://tremor.sh/api/query \
 
 <Columns cols={2}>
   <Card title="EventsPulse" icon="chart-line">
-    **Polymarket Intelligence Dashboard**
-    - Market intelligence overview
-    - TossUps (45-55% competitive markets)
-    - Shock Moves (>10% daily changes)
-    - Volume spikes and trends
+    Highlights toss-ups, shock moves, and volume spikes across Polymarket markets.
   </Card>
   <Card title="KalshiPulse" icon="landmark">
-    **Kalshi Market Dashboard**
-    - CFTC-regulated market tracking
-    - Real-time price movements
-    - Volume and liquidity analysis
-    - Settlement monitoring
+    Focused view on Kalshi events with settlement monitoring and order-book intelligence.
   </Card>
 </Columns>
 
-### Query Tools
+## Workflow Tools
 
-<Steps>
-  <Step title="SQL Editor">
-    Advanced query editor with syntax highlighting, line numbers, and auto-completion
-  </Step>
-  <Step title="Schema Browser">
-    Interactive table explorer with column types, sample data, and statistics
-  </Step>
-  <Step title="AI Assistant">
-    Claude-powered natural language to SQL conversion with streaming responses
-  </Step>
-  <Step title="Query History">
-    Automatic tracking of all queries with execution time and result metadata
-  </Step>
-</Steps>
-
-## Data Catalog
-
-Explore your data with comprehensive metadata:
-
-- **Table Discovery** - Browse all available tables and schemas
-- **Column Statistics** - Min/max values, distinct counts, data types
-- **Sample Data** - Preview rows before writing queries
-- **Relationship Mapping** - Understand connections between tables
-
-## Coming Soon
-
-<Note>
-Check out our roadmap for upcoming features and improvements.
-</Note>
-
-- **WebSocket streaming** - Real-time market updates
-- **Advanced analytics** - Pre-built statistical functions
-- **Data exports** - CSV and Parquet downloads
-- **Alerting system** - Custom market notifications
-- **GraphQL API** - Alternative query interface
+- Schema browser with column stats and sample rows  
+- Query history with execution time, row counts, and error tracking  
+- API key usage analytics for governance and billing insight  
+- Integration-ready responses (JSON, CSV export coming soon)
 
 ## Support
 
@@ -347,5 +126,5 @@ Check out our roadmap for upcoming features and improvements.
   icon="life-ring"
   href="mailto:team@tremor.sh"
 >
-  Questions about features? Contact team@tremor.sh
+  Have a feature request or question? Ping team@tremor.sh.
 </Card>

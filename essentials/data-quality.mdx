@@ -1,0 +1,47 @@
+---
+title: 'Data Quality & Freshness'
+description: 'Understand Tremor’s snapshot cadence, storage strategy, and reliability safeguards'
+icon: 'shield-check'
+---
+
+Tremor is engineered for accurate, low-latency prediction market data. This guide outlines how we capture, deduplicate, and monitor datasets.
+
+## Snapshot Cadence
+
+- **5-minute intervals** for Polymarket and Kalshi  
+- Historical retention is effectively unbounded—snapshots are never purged  
+- `_latest` views materialize the newest row per market for quick lookups
+
+<Info>
+Use `sync_timestamp` (DateTime64) to time-travel through history or join against `sync_run_history` for ingestion metadata.
+</Info>
+
+## Storage Model
+
+- ClickHouse `MergeTree` tables store canonical history (`polymarket_events`, `kalshi_markets`, etc.)  
+- `_latest` tables (`*_events_latest`, `*_markets_latest`) consolidate the freshest snapshot per identifier  
+- ReplacingMergeTree ensures deduplication while retaining precise audit trails
+
+## Freshness Guarantees
+
+We monitor sync pipelines with:
+
+- Automatic retries on transient upstream failures  
+- Backfill offsets to recover from prolonged outages  
+- Health dashboards powered by `/api/sync/status`, `/api/sync/history`, and `/sync/metrics`
+
+## Quality Signals in the Data
+
+- `active`, `closed`, and `archived` flags track lifecycle state  
+- Liquidity and volume fields (`volume_24hr`, `liquidity`) are recalculated each sync  
+- Metadata JSON in `sync_run_history` captures job-level diagnostics
+
+## Recommended Checks
+
+- **Null audits**: Call [Column Statistics](/api-reference/endpoint/table-stats) to monitor missing data trends.  
+- **Staleness alerts**: Notify when `polymarket_events_latest.sync_timestamp` exceeds your freshness budget.  
+- **Variance analysis**: Compare successive snapshots to detect sudden price or liquidity swings.
+
+---
+
+Continue with the [Sync Monitoring guide](/essentials/sync-monitoring) for operational playbooks and alerting ideas.
