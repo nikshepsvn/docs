@@ -4,9 +4,9 @@
   "name": "Tremor",
   "description": "The Data Terminal for Prediction Markets - Query millions of markets with SQL and historical snapshots every 5 minutes",
   "colors": {
-    "primary": "#3b82f6",
-    "light": "#60a5fa",
-    "dark": "#1d4ed8"
+    "primary": "#000000",
+    "light": "#ffffff",
+    "dark": "#000000"
   },
   "background": {
     "color": {
@@ -163,7 +163,8 @@
   },
   "styling": {
     "eyebrows": "breadcrumbs",
-    "codeblocks": "dark"
+    "codeblocks": "dark",
+    "rounded": "none"
   },
   "appearance": {
     "default": "dark",
