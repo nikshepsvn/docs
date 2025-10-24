@@ -38,11 +38,41 @@ curl -X POST https://tremor.sh/api/query \
 Keep your API key secure! Never commit it to version control or share it publicly.
 </Warning>
 
+## Available Endpoints
+
+### Queries
+- `POST /api/query` - Execute SQL queries against Tremor data
+- `POST /api/query/validate` - Validate SQL syntax without execution
+- `GET /api/query/{query_id}/stats` - Get execution statistics for a saved query
+- `GET /api/queries/stats` - List analytics for all saved queries
+
+### Metadata & Schema
+- `GET /api/tables` - List all available tables and namespaces
+- `GET /api/table/{namespace}/{table}` - Get schema for a specific table
+- `GET /api/table/{namespace}/{table}/sample` - Retrieve sample rows from a table
+- `GET /api/table/{namespace}/{table}/stats` - Get column-level statistics
+
+### Search & AI
+- `POST /api/markets/semantic-search` - Find markets using natural language
+- `POST /api/assistant/generate/stream` - Generate SQL from natural language (SSE streaming)
+
+### Sync Monitoring
+- `GET /api/sync/status` - Current sync status and recent runs
+- `GET /api/sync/history` - Historical sync execution logs
+- `GET /api/sync/metrics` - Aggregated sync performance metrics
+
+### API Key Management
+- `POST /api/keys/create` - Create a new API key
+- `GET /api/keys/list` - List your API keys
+- `DELETE /api/keys/{key_id}` - Revoke an API key
+
 ## Rate Limits
 
-- `POST /api/query`: 30 requests per minute per authenticated user or API key
-- Table metadata endpoints: 60 requests per minute
-- `POST /api/assistant/generate/stream`: 20 requests per minute (streaming SSE)
+- Query endpoints: 30 requests per minute
+- Metadata endpoints: 60 requests per minute
+- Sync monitoring: 60 requests per minute
+- API key management: 30 requests per minute
+- AI Assistant: 20 requests per minute
 
 If you receive a `429 Too Many Requests` response, pause briefly before retrying.
 
