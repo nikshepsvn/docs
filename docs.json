@@ -2,6 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Tremor",
+  "description": "The Data Terminal for Prediction Markets - Query millions of markets with SQL and historical snapshots every 5 minutes",
   "colors": {
     "primary": "#3b82f6",
     "light": "#60a5fa",
@@ -12,10 +13,16 @@
     }
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://tremor.sh"
+  },
   "navigation": {
     "tabs": [
       {
         "tab": "Documentation",
+        "icon": "book",
         "groups": [
           {
             "group": "Getting Started",
@@ -30,6 +37,7 @@
       },
       {
         "tab": "API Reference",
+        "icon": "terminal",
         "groups": [
           {
             "group": "Overview",
@@ -58,20 +66,18 @@
         {
           "anchor": "GitHub",
           "href": "https://github.com/nikshepsvn/tremor",
-          "icon": "github"
+          "icon": "github",
+          "iconType": "brands"
         }
       ]
     }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:team@tremor.sh"
+        "href": "mailto:team@tremor.sh",
+        "icon": "life-ring"
       }
     ],
     "primary": {
@@ -82,20 +88,34 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
       "github": "https://github.com/nikshepsvn/tremor",
       "x": "https://x.com/tremorsh"
     }
+  },
+  "seo": {
+    "indexing": "navigable"
+  },
+  "search": {
+    "prompt": "Search Tremor docs..."
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "dark"
+  },
+  "appearance": {
+    "default": "dark",
+    "strict": false
   }
 }
