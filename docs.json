@@ -18,23 +18,8 @@
             "pages": [
               "index",
               "quickstart",
-              "features"
-            ]
-          },
-          {
-            "group": "Core Concepts",
-            "pages": [
-              "essentials/architecture",
-              "essentials/data-sources",
-              "essentials/query-engine"
-            ]
-          },
-          {
-            "group": "Query Examples",
-            "pages": [
-              "essentials/arbitrage-queries",
-              "essentials/market-history",
-              "essentials/volume-analysis"
+              "features",
+              "development"
             ]
           }
         ]
@@ -43,18 +28,17 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Overview",
             "pages": [
-              "api-reference/introduction",
-              "api-reference/authentication"
+              "api-reference/introduction"
             ]
           },
           {
             "group": "Endpoints",
             "pages": [
-              "api-reference/endpoint/query",
-              "api-reference/endpoint/markets",
-              "api-reference/endpoint/ai-assistant"
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/create",
+              "api-reference/endpoint/delete"
             ]
           }
         ]
