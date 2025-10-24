@@ -5,6 +5,27 @@ openapi: 'GET /api/queries/stats'
 
 Review execution metrics for saved queries over the last 30 days. The response aggregates runtime, execution count, and the last execution timestamp for each saved query ID.
 
+### Example Response
+
+```json
+{
+  "queries": [
+    {
+      "query_id": "550e8400-e29b-41d4-a716-446655440000",
+      "execution_count": 127,
+      "avg_runtime_ms": 143.7,
+      "last_executed_at": "2025-10-24T15:23:11.123456Z"
+    },
+    {
+      "query_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "execution_count": 89,
+      "avg_runtime_ms": 67.2,
+      "last_executed_at": "2025-10-24T14:18:05.654321Z"
+    }
+  ]
+}
+```
+
 <Tip>
 To drill into a single saved query, call <a href="/api-reference/endpoint/query-stats-single">GET /api/query/{query_id}/stats</a> with the Supabase query identifier.
 </Tip>

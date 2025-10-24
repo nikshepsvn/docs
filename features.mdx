@@ -26,11 +26,26 @@ Tremor combines high-frequency market snapshots, a low-latency SQL engine, and A
 Need guarantees on freshness and retention? Review the [Data Quality guide](/essentials/data-quality).
 </Info>
 
+<Note>
+As of 2025-10-24, Tremor maintains <strong>56,519</strong> distinct Polymarket events, <strong>146,870</strong> Polymarket markets, and <strong>71,385</strong> Kalshi events across <strong>74,669</strong> live Kalshi snapshots.
+</Note>
+
 ## Snapshot Cadence
 
 - 5-minute sync intervals with automatic retries  
 - `_latest` views surface the freshest state per market  
 - Historical tables (`*_events`, `*_markets`) preserve every snapshot for backtesting
+
+## Query Performance
+
+<Tip>
+Running on ClickHouse keeps complex analytical queries comfortably sub-second.
+</Tip>
+
+- Median execution time (last 7 days, 13,988 tracked queries): **39 ms**
+- 95th percentile execution time: **226 ms**
+- Average execution time: **145 ms**
+
 
 ## Platform Highlights
 

@@ -38,6 +38,29 @@ When you provide <code>query_id</code>, the service fetches the latest SQL from 
 Track execution analytics with <a href="/api-reference/endpoint/query-stats">GET /api/query/{query_id}/stats</a> or list all saved query metrics via <a href="/api-reference/endpoint/query-stats">GET /api/queries/stats</a>.
 </Tip>
 
+### Example Response
+
+```json
+{
+  "success": true,
+  "result": {
+    "columns": ["title", "yes_probability", "volume_24hr"],
+    "data": [
+      ["Will Bitcoin hit $100k in 2025?", 0.67, 284567.23],
+      ["AI regulation passes before 2026", 0.52, 156234.89],
+      ["Trump wins 2024 election", 0.48, 1245678.90]
+    ],
+    "row_count": 3,
+    "execution_time_ms": 89,
+    "statistics": {
+      "elapsed": 0.086,
+      "rows_read": 56519
+    }
+  },
+  "query": "SELECT title, yes_probability, volume_24hr FROM polymarket_events ORDER BY volume_24hr DESC LIMIT 3"
+}
+```
+
 ### Validate before running
 
 Use <a href="/api-reference/endpoint/query-validate">POST /api/query/validate</a> to confirm syntax and inspect ClickHouse <code>EXPLAIN</code> output without incurring compute.

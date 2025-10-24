@@ -1,9 +1,71 @@
 ---
 title: 'Sync Metrics'
-openapi: 'GET /sync/metrics'
+openapi: 'GET /api/sync/metrics'
 ---
 
-Summarise long-term ingestion cadence for each source. Metrics include total successful runs, average duration, and recent interval distributions.
+Summarize long-term ingestion cadence for each source. Metrics include total successful runs, average duration, and recent interval distributions.
+
+<Info>
+Sync monitoring endpoints are rate limited to <strong>60 requests per minute</strong> per API key.
+</Info>
+
+### Example Response
+
+```json
+{
+  "metrics": {
+    "polymarket": {
+      "first_update": "2025-01-01T00:00:00.000Z",
+      "last_update": "2025-10-24T15:28:42.123Z",
+      "total_updates": 45678,
+      "successful_updates": 45234,
+      "failed_updates": 444,
+      "success_rate": 0.9903,
+      "avg_duration_seconds": 14.567,
+      "min_duration_seconds": 3.2,
+      "max_duration_seconds": 127.8,
+      "intervals": {
+        "recent": [5.2, 5.1, 5.3, 4.9, 5.0],
+        "avg_minutes": 5.1,
+        "target_minutes": 5.0,
+        "p95_minutes": 6.2
+      },
+      "rows_per_update": {
+        "avg": 1234,
+        "min": 0,
+        "max": 5678
+      }
+    },
+    "kalshi": {
+      "first_update": "2025-01-01T00:00:00.000Z",
+      "last_update": "2025-10-24T15:27:15.456Z",
+      "total_updates": 34567,
+      "successful_updates": 34123,
+      "failed_updates": 444,
+      "success_rate": 0.9872,
+      "avg_duration_seconds": 18.234,
+      "min_duration_seconds": 4.1,
+      "max_duration_seconds": 156.3,
+      "intervals": {
+        "recent": [5.4, 5.2, 5.5, 5.3, 5.1],
+        "avg_minutes": 5.3,
+        "target_minutes": 5.0,
+        "p95_minutes": 7.1
+      },
+      "rows_per_update": {
+        "avg": 891,
+        "min": 0,
+        "max": 3456
+      }
+    }
+  },
+  "overall": {
+    "uptime_percentage": 99.2,
+    "total_rows_synced": 89456782,
+    "last_24h_rows": 456789
+  }
+}
+```
 
 ### Response structure
 

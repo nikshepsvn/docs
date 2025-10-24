@@ -5,6 +5,10 @@ openapi: 'GET /api/tables'
 
 Discover the datasets available in Tremor, including historical and latest snapshot tables for Polymarket and Kalshi.
 
+<Info>
+Table metadata endpoints are rate limited to <strong>60 requests per minute</strong> per API key.
+</Info>
+
 ### Query parameters
 
 <ParamField query="with_stats" type="boolean" default="false">
@@ -14,6 +18,41 @@ Discover the datasets available in Tremor, including historical and latest snaps
 <ParamField query="refresh" type="boolean" default="false">
   Bypass the metadata cache and fetch fresh stats from ClickHouse.
 </ParamField>
+
+### Example Response
+
+```json
+{
+  "tables": [
+    {
+      "namespace": "polymarket",
+      "table": "events",
+      "full_name": "polymarket.events",
+      "source": "polymarket",
+      "row_count": 8456782,
+      "columns": [
+        {"name": "id", "type": "String"},
+        {"name": "title", "type": "String"},
+        {"name": "yes_probability", "type": "Float64"},
+        {"name": "sync_timestamp", "type": "DateTime64(3)"}
+      ]
+    },
+    {
+      "namespace": "kalshi",
+      "table": "events",
+      "full_name": "kalshi.events",
+      "source": "kalshi",
+      "row_count": 1234567,
+      "columns": [
+        {"name": "id", "type": "String"},
+        {"name": "title", "type": "String"},
+        {"name": "yes_probability", "type": "Float64"}
+      ]
+    }
+  ],
+  "count": 2
+}
+```
 
 ### Related endpoints
 

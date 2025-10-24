@@ -31,6 +31,43 @@ The embedding service runs inside Tremor—no additional API keys required. Requ
   Return only markets that are still trading.
 </ParamField>
 
+### Example Response
+
+```json
+{
+  "query": "election markets with high volume",
+  "results": [
+    {
+      "result_type": "market",
+      "platform": "polymarket",
+      "title": "Trump wins 2024 presidential election",
+      "subtitle": "Will Donald Trump win the 2024 U.S. presidential election?",
+      "category": "Politics",
+      "ticker": "trump-2024",
+      "event_ticker": "us-election-2024",
+      "similarity": 0.92,
+      "volume": 1245678.90,
+      "yes_bid": 0.47,
+      "yes_ask": 0.49,
+      "status": "active"
+    },
+    {
+      "result_type": "market",
+      "platform": "kalshi",
+      "title": "Presidential Election 2024 Winner",
+      "category": "Politics",
+      "ticker": "pres-2024",
+      "similarity": 0.87,
+      "volume": 987654.32,
+      "yes_bid": 0.46,
+      "yes_ask": 0.48,
+      "status": "active"
+    }
+  ],
+  "total": 2
+}
+```
+
 ### Response highlights
 
 Each result includes similarity scores, current liquidity metrics, and price quotes (bid/ask for Kalshi, yes/no probabilities for Polymarket). Use these signals to build recommendation systems or to seed arbitrage scanners.

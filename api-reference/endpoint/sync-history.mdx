@@ -5,6 +5,10 @@ openapi: 'GET /api/sync/history'
 
 Retrieve the most recent ingestion runs with execution timing, row counts, and error metadata.
 
+<Info>
+Sync monitoring endpoints are rate limited to <strong>60 requests per minute</strong> per API key.
+</Info>
+
 <ParamField query="limit" type="integer" default="20">
   Maximum number of runs to return (capped at 500).
 </ParamField>
@@ -13,8 +17,71 @@ Retrieve the most recent ingestion runs with execution timing, row counts, and e
   Filter to <code>polymarket</code> or <code>kalshi</code>. Leave blank for both.
 </ParamField>
 
+### Example Response
+
+```json
+{
+  "runs": [
+    {
+      "run_id": "550e8400-e29b-41d4-a716-446655440000",
+      "source": "polymarket",
+      "sync_type": "incremental",
+      "scope": "events",
+      "started_at": "2025-10-24T15:28:30.000Z",
+      "completed_at": "2025-10-24T15:28:42.123Z",
+      "status": "success",
+      "rows_inserted": 1247,
+      "rows_updated": 834,
+      "duration_seconds": 12.123,
+      "error": null,
+      "metadata": {
+        "api_calls": 3,
+        "rate_limit_remaining": 997
+      }
+    },
+    {
+      "run_id": "660e8400-e29b-41d4-a716-446655440001",
+      "source": "kalshi",
+      "sync_type": "incremental",
+      "scope": "markets",
+      "started_at": "2025-10-24T15:27:00.000Z",
+      "completed_at": "2025-10-24T15:27:15.456Z",
+      "status": "success",
+      "rows_inserted": 823,
+      "rows_updated": 412,
+      "duration_seconds": 15.456,
+      "error": null,
+      "metadata": {
+        "api_calls": 5,
+        "rate_limit_remaining": 995
+      }
+    },
+    {
+      "run_id": "770e8400-e29b-41d4-a716-446655440002",
+      "source": "polymarket",
+      "sync_type": "backfill",
+      "scope": "events",
+      "started_at": "2025-10-24T14:00:00.000Z",
+      "completed_at": "2025-10-24T14:05:32.789Z",
+      "status": "error",
+      "rows_inserted": 0,
+      "rows_updated": 0,
+      "duration_seconds": 332.789,
+      "error": "Rate limit exceeded: 429 Too Many Requests",
+      "metadata": {
+        "api_calls": 1000,
+        "rate_limit_remaining": 0,
+        "retry_after": 60
+      }
+    }
+  ],
+  "total": 3,
+  "has_more": true
+}
+```
+
 ### Use cases
 
-- Drive timeline visualisations showing successful and failed syncs.
+- Drive timeline visualizations showing successful and failed syncs.
 - Audit a specific backfill by filtering on <code>sync_type</code> and <code>scope</code>.
 - Diagnose errors quickly with the <code>error</code> and <code>metadata</code> fields.

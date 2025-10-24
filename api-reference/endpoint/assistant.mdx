@@ -23,6 +23,18 @@ Rate limit: <strong>20 requests per minute</strong> per API key. The <code>mode<
   Optional prior turns to maintain context. Supply objects with <code>role</code> and <code>content</code> fields.
 </ParamField>
 
+### Example SSE Stream
+
+```
+data: {"type":"plan","payload":{"step":"Analyzing schema for polymarket_events"}}
+
+data: {"type":"plan","payload":{"step":"Building SQL query with filters"}}
+
+data: {"type":"sql","payload":{"query":"SELECT title, yes_probability, volume_24hr FROM polymarket_events WHERE active = true ORDER BY volume_24hr DESC LIMIT 10"}}
+
+data: {"type":"final","payload":{"query_id":"550e8400-e29b-41d4-a716-446655440000","sql":"SELECT title, yes_probability, volume_24hr FROM polymarket_events WHERE active = true ORDER BY volume_24hr DESC LIMIT 10"}}
+```
+
 ### Stream handling
 
 - Each SSE event is emitted as <code>data: {"type": "...", "payload": ...}</code>.

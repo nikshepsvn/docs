@@ -5,9 +5,64 @@ openapi: 'GET /api/sync/status'
 
 Monitor ingestion freshness for Kalshi and Polymarket. The response aggregates table row counts, current backfill state, and the most recent successful or failed runs.
 
+<Info>
+Sync monitoring endpoints are rate limited to <strong>60 requests per minute</strong> per API key.
+</Info>
+
 <ParamField query="history_limit" type="integer" default="5">
   Number of historical runs to embed for each source.
 </ParamField>
+
+### Example Response
+
+```json
+{
+  "sources": {
+    "polymarket": {
+      "status": "syncing",
+      "last_sync": "2025-10-24T15:28:42.123Z",
+      "backfill_state": "idle",
+      "backfill_offsets": null,
+      "recent_runs": [
+        {
+          "run_id": "550e8400-e29b-41d4-a716-446655440000",
+          "started_at": "2025-10-24T15:28:30.000Z",
+          "completed_at": "2025-10-24T15:28:42.123Z",
+          "status": "success",
+          "rows_inserted": 1247,
+          "sync_type": "incremental"
+        }
+      ]
+    },
+    "kalshi": {
+      "status": "idle",
+      "last_sync": "2025-10-24T15:27:15.456Z",
+      "backfill_state": "idle",
+      "backfill_offsets": null,
+      "recent_runs": [
+        {
+          "run_id": "660e8400-e29b-41d4-a716-446655440001",
+          "started_at": "2025-10-24T15:27:00.000Z",
+          "completed_at": "2025-10-24T15:27:15.456Z",
+          "status": "success",
+          "rows_inserted": 823,
+          "sync_type": "incremental"
+        }
+      ]
+    }
+  },
+  "table_counts": {
+    "polymarket_events": 8456782,
+    "polymarket_markets": 15234567,
+    "kalshi_events": 4567890,
+    "kalshi_markets": 9876543
+  },
+  "sync_lag_seconds": {
+    "polymarket": 102,
+    "kalshi": 189
+  }
+}
+```
 
 ### Response highlights
 

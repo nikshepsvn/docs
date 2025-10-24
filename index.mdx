@@ -5,7 +5,7 @@ description: "The Data Terminal for Prediction Markets"
 
 # Welcome to Tremor
 
-Query millions of markets. Historical snapshots every 5 minutes. SQL access to the richest source of human forecasts.
+**The most comprehensive prediction market data platform.** Tremor gives you instant access to millions of historical market snapshots from Polymarket and Kalshi, updated every 5 minutes, with powerful tools to analyze and understand human forecasts at scale.
 
 <Card
   title="Get Started"
@@ -13,64 +13,70 @@ Query millions of markets. Historical snapshots every 5 minutes. SQL access to t
   href="/quickstart"
   horizontal
 >
-  Start querying prediction market data in minutes
+  Start exploring prediction market data in minutes
 </Card>
 
 ## What is Tremor?
 
-Tremor provides fast, reliable access to prediction market data from Polymarket and Kalshi. Built for traders, researchers, and enterprises who need historical market data and real-time analytics.
+Tremor is a complete data platform for prediction markets, designed for traders who need edge, researchers studying collective intelligence, and enterprises building market-based forecasting systems.
 
-**Tech Stack:** React + Vite frontend, FastAPI backend, ClickHouse database, Claude AI assistant.
+### Our Vision
 
-### Key Features
+Prediction markets aggregate millions of individual forecasts into actionable probabilities. Tremor makes this data accessible, analyzable, and actionable. Whether you're backtesting trading strategies, studying forecast accuracy, or building applications on top of market data, Tremor provides the infrastructure you need.
+
+## Data Coverage
 
 <Columns cols={2}>
   <Card
-    title="166K+ Markets"
+    title="140K+ Active Markets"
     icon="chart-line"
   >
-    Complete coverage of Polymarket and Kalshi markets with comprehensive historical data
+    62K+ Polymarket events and 75K+ Kalshi events, continuously updated
   </Card>
   <Card
     title="5-Minute Snapshots"
     icon="clock"
   >
-    Historical data snapshots every 5 minutes with unlimited retention
+    Historical data captured every 5 minutes with unlimited retention
   </Card>
   <Card
     title="Sub-200ms Queries"
     icon="bolt"
   >
-    ClickHouse-powered SQL engine for lightning-fast analytics
+    ClickHouse-powered analytics for instant insights at any scale
   </Card>
   <Card
-    title="REST API"
-    icon="code"
+    title="Full History Access"
+    icon="database"
   >
-    Programmatic access with API key authentication, per-key rate limits, and usage analytics
+    Time-series data for backtesting, research, and trend analysis
   </Card>
 </Columns>
 
-### Platform Features
+## Two Ways to Use Tremor
+
+### Web Platform
+
+Explore, analyze, and visualize prediction market data through our browser-based interface.
 
 <Columns cols={3}>
   <Card
     title="SQL Editor"
     icon="terminal"
   >
-    Advanced query editor with syntax highlighting and schema browser
+    Write and execute queries with syntax highlighting and schema browser
   </Card>
   <Card
     title="AI Assistant"
     icon="wand-magic-sparkles"
   >
-    Claude-powered natural language to SQL conversion
+    Describe what you want in plain English; get SQL automatically
   </Card>
   <Card
-    title="Live Dashboards"
+    title="Market Dashboards"
     icon="chart-mixed"
   >
-    EventsPulse and KalshiPulse for market intelligence
+    EventsPulse and KalshiPulse for live market intelligence
   </Card>
   <Card
     title="Data Catalog"
@@ -82,110 +88,99 @@ Tremor provides fast, reliable access to prediction market data from Polymarket 
     title="Semantic Search"
     icon="magnifying-glass"
   >
-    Find similar markets across platforms
+    Find similar markets across Polymarket and Kalshi using natural language
   </Card>
   <Card
     title="Query History"
     icon="clock-rotate-left"
   >
-    Track and replay all executed queries
+    Track, replay, and share every query you run
   </Card>
 </Columns>
 
-## Quick Example Queries
+### REST API
 
-### Find Arbitrage Opportunities
-
-```sql
-SELECT
-  p.title,
-  p.yes_probability as polymarket_yes,
-  k.yes_probability as kalshi_yes,
-  ABS(p.yes_probability - k.yes_probability) as spread
-FROM polymarket_events p
-INNER JOIN kalshi_events k ON similarity(p.title, k.title) > 0.8
-WHERE spread > 0.05
-ORDER BY spread DESC;
-```
-
-### Track Market History
-
-```sql
-SELECT
-  sync_timestamp,
-  yes_probability,
-  volume_24hr
-FROM polymarket_events
-WHERE id = 'trump-2024-election'
-ORDER BY sync_timestamp DESC
-LIMIT 1000;
-```
-
-### Volume Leaders
-
-```sql
-SELECT
-  title,
-  volume_24hr,
-  liquidity
-FROM polymarket_events
-WHERE active = true
-ORDER BY volume_24hr DESC
-LIMIT 10;
-```
-
-## Use Cases
-
-<Columns cols={3}>
-  <Card
-    title="Trading"
-    icon="chart-candlestick"
-  >
-    Identify arbitrage opportunities across prediction markets
-  </Card>
-  <Card
-    title="Research"
-    icon="flask"
-  >
-    Analyze market sentiment and forecasting accuracy
-  </Card>
-  <Card
-    title="Analytics"
-    icon="magnifying-glass-chart"
-  >
-    Build dashboards and monitor market trends
-  </Card>
-</Columns>
-
-## Next Steps
+Build applications, trading systems, and research pipelines on top of Tremor's data.
 
 <Columns cols={2}>
   <Card
-    title="Quickstart"
+    title="SQL Execution"
+    icon="code"
+  >
+    Run queries programmatically with JSON results
+  </Card>
+  <Card
+    title="Semantic Search"
+    icon="magnifying-glass"
+  >
+    Find markets by natural language description
+  </Card>
+  <Card
+    title="AI Assistant"
+    icon="wand-magic-sparkles"
+  >
+    Generate SQL from natural language (streaming endpoint)
+  </Card>
+  <Card
+    title="Schema Inspection"
+    icon="table"
+  >
+    Fetch table schemas, statistics, and sample data
+  </Card>
+</Columns>
+
+## Who Uses Tremor?
+
+<Columns cols={3}>
+  <Card
+    title="Traders"
+    icon="chart-candlestick"
+  >
+    Find mispricings, track liquidity, and backtest strategies across markets
+  </Card>
+  <Card
+    title="Researchers"
+    icon="flask"
+  >
+    Study forecast accuracy, market efficiency, and crowd wisdom at scale
+  </Card>
+  <Card
+    title="Developers"
+    icon="code"
+  >
+    Build apps, bots, and analytics tools on reliable market data infrastructure
+  </Card>
+</Columns>
+
+## Get Started
+
+<Columns cols={2}>
+  <Card
+    title="Platform Quickstart"
     icon="play"
     href="/quickstart"
   >
-    Get up and running with Tremor in minutes
+    Start using the web interface and run your first query
   </Card>
   <Card
-    title="API Reference"
-    icon="terminal"
+    title="API Documentation"
+    icon="brackets-curly"
     href="/api-reference/introduction"
   >
-    Explore the complete API documentation
-  </Card>
-  <Card
-    title="API Access Guide"
-    icon="terminal"
-    href="/essentials/api-access"
-  >
-    Learn how to authenticate, validate, and monitor usage
+    Integrate Tremor into your application or workflow
   </Card>
   <Card
     title="Query Recipes"
-    icon="code"
+    icon="book-open"
     href="/essentials/query-recipes"
   >
-    Discover powerful SQL patterns for trading and research
+    Learn powerful SQL patterns for common use cases
+  </Card>
+  <Card
+    title="AI Assistant Guide"
+    icon="wand-magic-sparkles"
+    href="/essentials/ai-assistant"
+  >
+    Use natural language to explore data without writing SQL
   </Card>
 </Columns>

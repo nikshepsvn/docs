@@ -5,6 +5,16 @@ openapi: 'GET /api/query/{query_id}/stats'
 
 Inspect execution metrics for a single saved query. Tremor reports how many times the query ran successfully, the average runtime, and when it last executed.
 
+### Example Response
+
+```json
+{
+  "execution_count": 127,
+  "avg_runtime_ms": 143.7,
+  "last_executed_at": "2025-10-24T15:23:11.123456Z"
+}
+```
+
 <ParamField path="query_id" type="string" required>
   Supabase identifier of the saved query.
 </ParamField>

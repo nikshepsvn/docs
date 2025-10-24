@@ -6,7 +6,51 @@ openapi: 'GET /api/keys/list'
 Return all active API keys for the authenticated user, including creation timestamps and the most recent usage time.
 
 <Info>
+API key management endpoints are rate limited to <strong>30 requests per minute</strong> per authenticated user.
+</Info>
+
+<Info>
 Keys are filtered by <code>user_id</code> server-side; the endpoint never exposes other users' credentials.
 </Info>
+
+### Example Response
+
+```json
+{
+  "keys": [
+    {
+      "key_id": "550e8400-e29b-41d4-a716-446655440000",
+      "key_prefix": "tmr_sk_live_a1b2c3d4",
+      "name": "Production API Key",
+      "created_at": "2025-10-24T15:30:00.000Z",
+      "expires_at": "2026-10-24T15:30:00.000Z",
+      "last_used_at": "2025-10-24T16:45:23.123Z",
+      "is_active": true,
+      "usage_count": 1247
+    },
+    {
+      "key_id": "660e8400-e29b-41d4-a716-446655440001",
+      "key_prefix": "tmr_sk_test_x9y8z7w6",
+      "name": "Development Key",
+      "created_at": "2025-09-15T10:00:00.000Z",
+      "expires_at": null,
+      "last_used_at": "2025-10-23T14:20:00.000Z",
+      "is_active": true,
+      "usage_count": 523
+    },
+    {
+      "key_id": "770e8400-e29b-41d4-a716-446655440002",
+      "key_prefix": "tmr_sk_live_p0o9i8u7",
+      "name": "Legacy Key",
+      "created_at": "2025-06-01T08:30:00.000Z",
+      "expires_at": "2025-09-01T08:30:00.000Z",
+      "last_used_at": "2025-08-25T12:00:00.000Z",
+      "is_active": false,
+      "usage_count": 8934
+    }
+  ],
+  "total": 3
+}
+```
 
 Use this endpoint to populate account settings pages or to show when a key was last used.

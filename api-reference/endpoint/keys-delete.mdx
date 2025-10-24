@@ -5,9 +5,26 @@ openapi: 'DELETE /api/keys/{key_id}'
 
 Deactivate an existing API key immediately. The action is irreversible; clients using the key will start receiving <code>401 Unauthorized</code> responses.
 
+<Info>
+API key management endpoints are rate limited to <strong>30 requests per minute</strong> per authenticated user.
+</Info>
+
 <ParamField path="key_id" type="string" required>
   Identifier of the key to revoke. Obtain from <a href="/api-reference/endpoint/keys-list">GET /api/keys/list</a>.
 </ParamField>
+
+### Example Response
+
+```json
+{
+  "success": true,
+  "key_id": "550e8400-e29b-41d4-a716-446655440000",
+  "key_prefix": "tmr_sk_live_a1b2c3d4",
+  "name": "Production API Key",
+  "revoked_at": "2025-10-24T15:35:00.000Z",
+  "message": "API key successfully revoked"
+}
+```
 
 <Warning>
 Only the key owner can revoke their key. The service returns <code>403 Forbidden</code> if the key belongs to another user.

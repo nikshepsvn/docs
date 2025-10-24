@@ -5,6 +5,10 @@ openapi: 'GET /api/table/{namespace}/{table}/stats'
 
 Retrieve column-level metrics—min/max values, null counts, cardinality buckets—to guide query writers and UI filters.
 
+<Info>
+Table metadata endpoints are rate limited to <strong>60 requests per minute</strong> per API key.
+</Info>
+
 <ParamField path="namespace" type="string" required>
   Data source namespace to inspect (for example <code>polymarket</code> or <code>kalshi</code>).
 </ParamField>
@@ -12,6 +16,39 @@ Retrieve column-level metrics—min/max values, null counts, cardinality buckets
 <ParamField path="table" type="string" required>
   Table name within the namespace (such as <code>events</code>, <code>markets</code>, or <code>events_latest</code>).
 </ParamField>
+
+### Example Response
+
+```json
+{
+  "namespace": "polymarket",
+  "table": "events",
+  "column_stats": [
+    {
+      "column": "yes_probability",
+      "data_type": "Float64",
+      "row_count": 8456782,
+      "null_count": 0,
+      "min_value": 0.001,
+      "max_value": 0.999,
+      "avg_value": 0.512,
+      "distinct_count": 458234,
+      "cardinality": "high"
+    },
+    {
+      "column": "volume_24hr",
+      "data_type": "Float64",
+      "row_count": 8456782,
+      "null_count": 23456,
+      "min_value": 0,
+      "max_value": 15678901.23,
+      "avg_value": 23456.78,
+      "distinct_count": 234567,
+      "cardinality": "high"
+    }
+  ]
+}
+```
 
 <Tip>
 Tremor samples the first 20 columns to keep statistics responsive. If you need deeper profiling, run aggregate queries through <a href="/api-reference/endpoint/query">POST /api/query</a>.

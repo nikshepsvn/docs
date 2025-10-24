@@ -16,6 +16,17 @@ Validation requests are capped at <strong>60 per minute</strong> per authenticat
 - <code>explain</code>: Raw ClickHouse <code>EXPLAIN</code> output you can surface in tooling
 - <code>estimated_rows</code>: Reserved for future row-count estimation
 
+### Example Response
+
+```json
+{
+  "valid": true,
+  "error": null,
+  "estimated_rows": null,
+  "explain": "Expression ((Projection + Before ORDER BY))\n  Sorting (Sorting for ORDER BY)\n    Expression (Before ORDER BY)\n      ReadFromMergeTree (polymarket_events)"
+}
+```
+
 ### Usage tips
 
 - Call this endpoint from editors or CI pipelines before submitting expensive jobs.

@@ -17,6 +17,22 @@ Grab example rows from any dataset to understand field semantics or build fixtur
   Number of rows to return. The service caps this at 100 per request.
 </ParamField>
 
+### Example Response
+
+```json
+{
+  "namespace": "polymarket",
+  "table": "events",
+  "columns": ["id", "title", "yes_probability", "volume_24hr", "sync_timestamp"],
+  "sample_data": [
+    ["btc-100k-2025", "Will Bitcoin hit $100k in 2025?", 0.67, 284567.23, "2025-10-24T15:30:00.000"],
+    ["ai-regulation-2026", "AI regulation passes before 2026", 0.52, 156234.89, "2025-10-24T15:30:00.000"],
+    ["trump-2024", "Trump wins 2024 election", 0.48, 1245678.90, "2025-10-24T15:30:00.000"]
+  ],
+  "sample_size": 3
+}
+```
+
 <Info>
 Sample requests are rate limited to <strong>60 per minute</strong> per API key.
 </Info>
