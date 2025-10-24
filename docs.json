@@ -107,7 +107,12 @@
     }
   },
   "seo": {
-    "indexing": "navigable"
+    "indexing": "navigable",
+    "metatags": {
+      "og:title": "Tremor - The Data Terminal for Prediction Markets",
+      "og:description": "Query millions of markets with SQL and historical snapshots every 5 minutes",
+      "og:site_name": "Tremor"
+    }
   },
   "search": {
     "prompt": "Search Tremor docs..."
